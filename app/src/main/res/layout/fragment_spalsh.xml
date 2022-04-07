@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
+    tools:context=".ui.MainActivity"
+    android:background="@color/purple_shade">
+
+
+
+    <LinearLayout
+        android:gravity="center"
+        android:weightSum="2"
+        android:layout_centerInParent="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:contentDescription="@string/music_player_logo_description"
+            android:id="@+id/app_logo"
+            android:layout_weight="1"
+            android:src="@drawable/music_notes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/app_textlabel"
+        style="@style/lighttext"
+        android:textSize="30sp"
+        android:layout_margin="30dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:text="@string/music_player_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
+</RelativeLayout>

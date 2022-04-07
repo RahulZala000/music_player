@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Music Player</string>
+    <string name="music_player_title">Music Player</string>
+    <string name="music_player_logo_description">Music_Player_Logo_Description</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="filename">File Name</string>
 </resources>
