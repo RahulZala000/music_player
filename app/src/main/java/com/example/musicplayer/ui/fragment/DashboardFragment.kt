@@ -1,15 +1,24 @@
 package com.example.musicplayer.ui.fragment
 
-import android.R.string
 import android.database.Cursor
+import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.musicplayer.R
+import com.example.musicplayer.adapter.SongAdapter
+import com.example.musicplayer.common.AdapterClickListerner
 import com.example.musicplayer.databinding.FragmentDashboardBinding
+import com.example.musicplayer.model.SongResponse
 import kotlinx.android.synthetic.main.fragment_dashboard.*
+import kotlinx.android.synthetic.main.layout_playsheet.*
 
 
 class DashboardFragment : BaseFragment() {
@@ -18,13 +27,22 @@ class DashboardFragment : BaseFragment() {
     private val binding: FragmentDashboardBinding
         get() = _binding!!
 
-   // val audiolist: ArrayList<string> = ArrayList()
-    lateinit var audioList:ArrayList<String>
+    lateinit var mediaPlayer: MediaPlayer
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+
+    var audioList= ArrayList<SongResponse>()
+   //  lateinit var arrayAdapter: ArrayAdapter<*>
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        pause.visibility=View.GONE
+        play.visibility=View.VISIBLE
+
+        fetch_song()
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,43 +50,63 @@ class DashboardFragment : BaseFragment() {
     ): View? {
         // Inflate the layout for this fragment
        _binding=FragmentDashboardBinding.inflate(layoutInflater)
-        fetch_song()
+
         return binding.root
     }
 
     override fun setupUI() {
 
+        click()
     }
 
-    fun fetch_song(){
-
-        val proj = arrayOf(MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DISPLAY_NAME)
-
-        val audioCursor: Cursor? = context?.getContentResolver()?.query(
-            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-            proj,
-            null,
-            null,
-            null
-        )
-
-        if (audioCursor != null) {
-            if (audioCursor.moveToFirst()) {
-                do {
-                    val audioIndex =
-                        audioCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
-                    audioList.add(audioCursor.getString(audioIndex))
-                } while (audioCursor.moveToNext())
-            }
+    fun click()
+    {
+        play.setOnClickListener{
+            play.visibility=View.GONE
+            pause.visibility=View.VISIBLE
         }
-
-        audioCursor?.close();
-
-
-    //    ArrayAdapter<string> adapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,android.R.id.text1, audioList);
-    //    audioView.setAdapter(adapter);
-
-       // val adapter: ArrayAdapter<string> = ArrayAdapter<Any?>(this, R.layout.simple_list_item_1, R.id.text1, audioList)
-      //  song.setAdapter(adapter) as ArrayList<String>
+        pause.setOnClickListener{
+            play.visibility=View.VISIBLE
+            pause.visibility=View.GONE
+        }
     }
+
+    fun fetch_song()
+    {
+
+     // audioList!!.clear()
+        var suri:Uri=MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        var cur: Cursor? =context?.contentResolver?.query(suri,null,null,null,null)
+
+            if(cur!=null && cur.moveToFirst())
+            {
+                var songtitle:Int= cur.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)
+//                var songsources:Int=cur.getColumnIndex(MediaStore.Audio.Media.TITLE_RESOURCE_URI)
+                while (cur.moveToNext())
+                {
+                    var songname:String=cur.getString(songtitle)
+//                    var songurl:String=cur.getString(songsources)
+                    audioList.add(SongResponse(songname,""))
+                }
+             //   audioList.add(songtitle.toString())
+                Log.d("@Data",audioList!!.size.toString())
+            }
+
+        cur?.close()
+        song.layoutManager=LinearLayoutManager(requireContext())
+        song.adapter=SongAdapter(audioList,object : AdapterClickListerner{
+            override fun onItemClick(view: View?, pos: Int, song: Any?) {
+              //  mediaPlayer.setDataSource()
+                Toast.makeText(requireContext(),"Song Name: "+song,Toast.LENGTH_SHORT).show()
+            }
+
+        })
+
+
+
+      //  songadapter?.notifyDataSetChanged()
+
+    }
+
+
 }
