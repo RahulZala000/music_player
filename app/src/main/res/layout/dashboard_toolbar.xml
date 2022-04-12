@@ -24,11 +24,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="@+id/name"
             app:layout_constraintEnd_toStartOf="@+id/menu"
             app:layout_constraintHorizontal_bias="0.949"
-            app:layout_constraintStart_toEndOf="@+id/linearLayoutCompat"
-            app:srcCompat="@drawable/ic_search"
-            tools:layout_editor_absoluteY="5dp" />
+            app:layout_constraintStart_toEndOf="@+id/name"
+            app:layout_constraintTop_toTopOf="@+id/name"
+            app:srcCompat="@drawable/ic_search" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/menu"
@@ -41,25 +42,21 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/linearLayoutCompat"
-            android:layout_width="0dp"
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="end"
-            android:orientation="vertical"
-            app:layout_constraintTop_toTopOf="parent">
+            android:padding="@dimen/_5sdp"
+            android:paddingStart="@dimen/_7sdp"
+            android:paddingEnd="@dimen/_7sdp"
+            android:text="@string/music_player_title"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_12ssp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/_5sdp"
-                android:paddingStart="@dimen/_7sdp"
-                android:paddingEnd="@dimen/_7sdp"
-                android:text="@string/music_player_title"
-                android:textColor="@color/white"
-                android:textSize="@dimen/_12ssp" />
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

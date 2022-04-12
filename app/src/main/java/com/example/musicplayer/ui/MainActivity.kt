@@ -32,49 +32,16 @@ class MainActivity : AppCompatActivity() {
 
 
         supportActionBar?.hide()
-      //  fetch_song()
+        //  fetch_song()
         setupUi()
 
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 100)
-        }
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), 200)
+
 
     }
-
-/*    fun fetch_song(){
-
-        val proj = arrayOf(MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DISPLAY_NAME)
-
-        val audioCursor: Cursor? = getContentResolver()?.query(
-            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-            proj,
-            null,
-            null,
-            null
-        )
-
-        if (audioCursor != null) {
-            if (audioCursor.moveToFirst()) {
-                do {
-                    val audioIndex =
-                        audioCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
-                    audioList?.add(audioCursor.getString(audioIndex))
-                } while (audioCursor.moveToNext())
-            }
-        }
-
-        audioCursor?.close();
-
-
-
-        */
-      //  if(audioList!=null)
-      //  adapter = audioList?.let { SongAdapter(it) }!!;
-        //    audioView.setAdapter(adapter);
-
-        // val adapter: ArrayAdapter<string> = ArrayAdapter<Any?>(this, R.layout.simple_list_item_1, R.id.text1, audioList)
-        //  song.setAdapter(adapter) as ArrayList<String>
-  //  }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -85,8 +52,11 @@ class MainActivity : AppCompatActivity() {
 
         if(requestCode==100 && grantResults[0]==PackageManager.PERMISSION_GRANTED)
         {
-           // btn_take_picture.isEnabled=true
-            Toast.makeText(this,"done",Toast.LENGTH_LONG).show()
+
+        }
+        if(requestCode==200 && grantResults[0]==PackageManager.PERMISSION_GRANTED)
+        {
+
         }
     }
 
@@ -96,10 +66,14 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.nav_frag) as NavHostFragment
         navController = navHostFragment.navController
 
-     //   val navGraph = navController.navInflater.inflate(R.navigation.)
+        //   val navGraph = navController.navInflater.inflate(R.navigation.)
 
-      //  navGraph.startde
-     //   navController.graph = navGraph
+        //  navGraph.startde
+        //   navController.graph = navGraph
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 
 }

@@ -8,7 +8,7 @@
     <TextView
         android:id="@+id/song"
         android:text="Song"
-        android:textSize="@dimen/_20sdp"
+        android:textSize="@dimen/_10sdp"
         android:clickable="true"
         android:textColor="@color/white"
         android:layout_width="match_parent"
