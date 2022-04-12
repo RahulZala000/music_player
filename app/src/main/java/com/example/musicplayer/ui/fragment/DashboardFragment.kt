@@ -225,6 +225,7 @@ class DashboardFragment : BaseFragment() {
 
    fun fetch_song()
     {
+
         var suri:Uri=MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(
             MediaStore.Audio.AudioColumns.DATA,
