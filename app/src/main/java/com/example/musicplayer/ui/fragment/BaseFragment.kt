@@ -22,8 +22,11 @@ abstract class BaseFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupUI()
+
+        click()
     }
 
+    abstract fun click()
     abstract fun setupUI()
 
 }

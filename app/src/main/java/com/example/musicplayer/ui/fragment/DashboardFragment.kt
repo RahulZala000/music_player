@@ -10,12 +10,14 @@ import android.provider.MediaStore
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.compose.ui.state.ToggleableState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.musicplayer.adapter.SongAdapter
@@ -23,6 +25,8 @@ import com.example.musicplayer.adapter.SonglistAdapter
 import com.example.musicplayer.common.AdapterClickListerner
 import com.example.musicplayer.databinding.FragmentDashboardBinding
 import com.example.musicplayer.model.SongResponse
+import kotlinx.android.synthetic.main.dashboard_toolbar.*
+import kotlinx.android.synthetic.main.dashboard_toolbar.view.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.android.synthetic.main.layout_playsheet.*
 import kotlinx.android.synthetic.main.layout_playsheet.view.*
@@ -56,6 +60,7 @@ class DashboardFragment : BaseFragment() {
     }
 
     override fun setupUI() {
+
         if(mp!=null) {
             play.visibility = View.INVISIBLE
             pause.visibility=View.VISIBLE
@@ -85,16 +90,13 @@ class DashboardFragment : BaseFragment() {
 
         })
 
-       fetch_song()
-        click()
-
-
-       // search()
+        fetch_song()
+        search()
 
 
     }
 
-    fun click()
+    override fun click()
     {
        play.setOnClickListener{
             play.visibility=View.INVISIBLE
@@ -108,6 +110,9 @@ class DashboardFragment : BaseFragment() {
                mp=media(tempsong)
            }
             mp?.start()
+           seekBar.progress=0
+           seekBar.progress= mp!!.currentPosition
+           Log.d("@t",mp?.currentPosition.toString())
 
 
 
@@ -153,6 +158,26 @@ class DashboardFragment : BaseFragment() {
             play.visibility=View.INVISIBLE
             pause.visibility=View.VISIBLE
         }
+
+
+       // Thread((Runnable) {
+
+      //  })
+
+
+    }
+
+    fun timeduration(duration:Int):String {
+
+        var min:Int=duration/1000/60
+        var sec:Int=duration/1000%60
+
+
+
+        if (sec<10 )
+            return ""+min + ":0"+sec
+        else
+            return ""+min + ":"+sec
     }
 
     fun speech(){
@@ -284,34 +309,55 @@ class DashboardFragment : BaseFragment() {
 
     }
 
+     fun search(){
 
+         var temp:ArrayList<SongResponse> = ArrayList()
 
-    /* fun search(){
-
-         var temp:ArrayList<String> = ArrayList()
-
-         search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-             override fun onQueryTextSubmit(query: String?): Boolean {
-                for(d in audioList)
+        search_song.setOnQueryTextFocusChangeListener(object : SearchView.OnQueryTextListener,
+            View.OnFocusChangeListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                Log.d("@Tag",query.toString())
+                for(d in audiolist)
                 {
-                    if(query.toString() in d)
+                    if(query.toString()?.contains(d.songname.toString()))
                         temp.add(d)
                 }
-                 return false
-             }
+                if(query=="" || query!!.isEmpty())
+                    songadapter.searchlist(audiolist)
+                else
+                    songadapter.searchlist(temp)
 
-             override fun onQueryTextChange(newt: String?): Boolean {
-                 for(d in audioList)
-                 {
-                     if(newt.toString() in d)
-                         temp.add(d)
-                 }
-                 return false
-             }
-         })
-     }*/
+                return false
+            }
 
-    /* fun fliterlist(list:String)
+            override fun onQueryTextChange(newText: String?): Boolean {
+                Log.d("@Tagg",newText.toString())
+
+
+                for(d in audiolist)
+                {
+                    if(newText.toString()?.contains(d.songname.toString()))
+                        temp.add(d)
+                }
+                if(newText=="" || newText!!.isEmpty())
+                    songadapter.searchlist(audiolist)
+                else
+                    songadapter.searchlist(temp)
+                return false
+            }
+
+            override fun onFocusChange(p0: View?, p1: Boolean) {
+                if(p1)
+                   toolbar.name.visibility =View.INVISIBLE
+                else
+                    toolbar.name.visibility=View.VISIBLE
+            }
+
+        })
+
+     }
+
+  /*   fun fliterlist(list:String)
      {
 
 
@@ -328,15 +374,20 @@ class DashboardFragment : BaseFragment() {
          else
              songadapter.songlist=temp
 
-     }
- */
+     }*/
+
 
     fun media(temp:SongResponse):MediaPlayer
     {
         var uri:Uri=Uri.parse(temp.path)
         playsheet.songname.text=temp.songname
         mp= MediaPlayer.create(requireContext(),uri)
+
+        seekBar.max=mp!!.duration
+        end.text=timeduration(mp?.duration!!)
+
         return mp!!
     }
 }
+
 

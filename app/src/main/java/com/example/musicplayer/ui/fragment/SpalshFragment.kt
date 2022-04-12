@@ -19,7 +19,7 @@ class SpalshFragment : BaseFragment() {
         get() = _binding!!
 
     private val activityScope = CoroutineScope(Dispatchers.Main)
-    val time = 2000L
+    val time = 1000L
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,8 +32,12 @@ class SpalshFragment : BaseFragment() {
     ): View? {
         _binding = FragmentSpalshBinding.inflate(layoutInflater, container, false)
 
-        goToNextScreen()
+
         return binding.root
+    }
+
+    override fun click() {
+        goToNextScreen()
     }
 
     override fun setupUI() {

@@ -30,4 +30,10 @@ class SonglistAdapter(var songlist: ArrayList<SongResponse>,var itemclick:Adapte
         return songlist.size
     }
 
+    fun searchlist(Songlist: ArrayList<SongResponse>)
+    {
+        songlist=Songlist
+        notifyDataSetChanged()
+    }
+
 }
