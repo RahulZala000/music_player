@@ -1,46 +1,48 @@
 package com.example.musicplayer.ui.fragment
 
+import android.content.ComponentName
 import android.content.Intent
+import android.content.ServiceConnection
 import android.database.Cursor
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
 import android.provider.MediaStore
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
-import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
-import androidx.compose.ui.state.ToggleableState
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.musicplayer.adapter.SongAdapter
 import com.example.musicplayer.adapter.SonglistAdapter
 import com.example.musicplayer.common.AdapterClickListerner
 import com.example.musicplayer.databinding.FragmentDashboardBinding
 import com.example.musicplayer.model.SongResponse
+import com.example.musicplayer.service.MusicService
 import kotlinx.android.synthetic.main.dashboard_toolbar.*
 import kotlinx.android.synthetic.main.dashboard_toolbar.view.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.android.synthetic.main.layout_playsheet.*
 import kotlinx.android.synthetic.main.layout_playsheet.view.*
 import java.util.*
-import kotlin.collections.ArrayList
 
 
-class DashboardFragment : BaseFragment() {
+class DashboardFragment : BaseFragment(), ServiceConnection {
 
     private var _binding: FragmentDashboardBinding? = null
     private val binding: FragmentDashboardBinding
         get() = _binding!!
 
-    var mp: MediaPlayer?=null
+     var mp: MediaPlayer?=null
     lateinit var speechintent:Intent
     lateinit var speechRecognizer: SpeechRecognizer
 
@@ -49,12 +51,20 @@ class DashboardFragment : BaseFragment() {
     lateinit var songadapter:SonglistAdapter
     var pos:Int=0
     var keep:String=""
+  /*  lateinit var runnable:Runnable
+    lateinit var time:Thread*/
+    var musicService:MusicService?=null
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
        _binding=FragmentDashboardBinding.inflate(layoutInflater)
+
+     //   var intent=Intent(activity,MusicService::class.java)
+       // bindservice()
+
 
         return binding.root
     }
@@ -70,7 +80,32 @@ class DashboardFragment : BaseFragment() {
             pause.visibility=View.INVISIBLE
         }
 
+        if(mp!=null) {
+            mp!!.setOnCompletionListener {
+                    mp!!.isLooping=false
+                    mp = media(audiolist.get(++pos))
+                    mp!!.start()
+
+            }
+        }
+
         speech()
+
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(p0: SeekBar?, seek: Int, p2: Boolean) {
+                    start.text=timeduration(seek)
+                    mp!!.seekTo(seek)
+            }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
+
+            }
+
+        })
 
         song.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
@@ -93,6 +128,26 @@ class DashboardFragment : BaseFragment() {
         fetch_song()
         search()
 
+      /* runnable= object :Runnable {
+            override fun run() {
+                var han = Handler(Looper.getMainLooper())
+
+                han.post(object : Runnable {
+                    override fun run() {
+                        Timer().schedule(object : TimerTask() {
+                            override fun run() {
+                                try {
+                                     seekBar.progress = mp!!.currentPosition
+                                } catch (e: Exception) {
+                                }
+                            }
+                        }, 0,1050)
+                    }
+
+                })
+
+            }
+        }*/
 
     }
 
@@ -109,12 +164,10 @@ class DashboardFragment : BaseFragment() {
                playsheet.songname.text= tempsong!!.songname
                mp=media(tempsong)
            }
+           start.text=timeduration(mp!!.currentPosition)
+           seekBar.progress=mp!!.currentPosition
+
             mp?.start()
-           seekBar.progress=0
-           seekBar.progress= mp!!.currentPosition
-           Log.d("@t",mp?.currentPosition.toString())
-
-
 
         }
         pause.setOnClickListener{
@@ -124,13 +177,37 @@ class DashboardFragment : BaseFragment() {
             mp?.pause()
 
 
+
         }
+
+        next.setOnLongClickListener(object :View.OnLongClickListener{
+            override fun onLongClick(p0: View?): Boolean {
+                if(mp!=null) {
+                    seekBar.progress=mp!!.currentPosition+10000
+                }
+                return true
+            }
+
+        })
+
+        preview.setOnLongClickListener(object :View.OnLongClickListener{
+            override fun onLongClick(p0: View?): Boolean {
+                if(mp!=null) {
+                    start.text = timeduration(mp!!.currentPosition - 10000)
+                    seekBar.progress=mp!!.currentPosition-10000
+                    Toast.makeText(requireContext(), start.text, Toast.LENGTH_SHORT).show()
+                }
+                return true
+            }
+
+        })
+
+
+
         next.setOnClickListener{
 
-            if (mp!=null && audiolist.size-1>pos)
-                ++pos
-            else
-                pos=0
+            if (mp!=null && audiolist.size-1>pos) ++pos
+            else pos=0
 
             mp?.stop()
             mp?.release()
@@ -144,10 +221,8 @@ class DashboardFragment : BaseFragment() {
 
         preview.setOnClickListener {
 
-            if (mp!=null && audiolist.size-1<pos)
-                --pos
-            else
-                pos=audiolist.size-1
+            if (pos==0) pos=audiolist.size-1
+            else --pos
 
             mp?.stop()
             mp?.release()
@@ -158,11 +233,6 @@ class DashboardFragment : BaseFragment() {
             play.visibility=View.INVISIBLE
             pause.visibility=View.VISIBLE
         }
-
-
-       // Thread((Runnable) {
-
-      //  })
 
 
     }
@@ -273,7 +343,6 @@ class DashboardFragment : BaseFragment() {
                     var songname:String=cur.getString(songtitle)
                     var ur=cur.getString(file)
                     val falbum: String = cur.getString(album)
-                //    val artist: String = cur.getString(3)
 
                     audiolist.add(SongResponse(songname,ur,falbum))
 
@@ -290,7 +359,7 @@ class DashboardFragment : BaseFragment() {
                 tempsong = Song as SongResponse
                 pos=Pos
 
-                if(mp!=null)
+                if(!mp!!.isPlaying)
                 {
                     pause.visibility=View.INVISIBLE
                     play.visibility=View.VISIBLE
@@ -382,12 +451,24 @@ class DashboardFragment : BaseFragment() {
         var uri:Uri=Uri.parse(temp.path)
         playsheet.songname.text=temp.songname
         mp= MediaPlayer.create(requireContext(),uri)
-
         seekBar.max=mp!!.duration
+        start.text=timeduration(mp?.currentPosition!!)
         end.text=timeduration(mp?.duration!!)
-
+        seekBar.progress=mp!!.currentPosition
+        /*time= Thread(runnable)
+        time.start()*/
         return mp!!
     }
+
+    override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
+        val binder=p1 as MusicService.MyBinder
+        musicService=binder.currentservice()
+    }
+
+    override fun onServiceDisconnected(p0: ComponentName?) {
+       musicService=null
+    }
+
 }
 
 

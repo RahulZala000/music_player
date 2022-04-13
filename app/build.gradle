@@ -90,4 +90,7 @@ dependencies {
     //daxter for runtime permission
     implementation 'com.karumi:dexter:6.2.3'
 
+    //media notification
+    implementation 'androidx.media:media:1.5.0'
+
 }
