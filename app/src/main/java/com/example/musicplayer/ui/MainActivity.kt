@@ -22,9 +22,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
 
 
-    /* var audioList:ArrayList<String>?=null
-     lateinit var adapter: SongAdapter
-*/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding= ActivityMainBinding.inflate(layoutInflater)
@@ -32,7 +29,6 @@ class MainActivity : AppCompatActivity() {
 
 
         supportActionBar?.hide()
-        //  fetch_song()
         setupUi()
 
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
@@ -60,6 +56,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun start_thread()
+    {
+
+    }
+
+    fun end_thread()
+    {
+
+    }
 
     private fun setupUi() {
         navHostFragment =

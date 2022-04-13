@@ -1,0 +1,53 @@
+
+   thread execute
+       Thread {
+        //    while(mp!!.currentPosition<mp!!.duration)
+            requireActivity().runOnUiThread(Runnable {
+                start.text = timeduration(mp!!.currentPosition)
+            })
+        }.start()
+
+
+
+        for searchlist
+             fun fliterlist(list:String)
+             {
+
+
+                     for(d in audioList)
+                     {
+                         if(list in d)
+                             temp.add(d)
+                     }
+
+
+
+                 if(songadapter.songlist.size==0)
+                     songadapter.songlist=audioList
+                 else
+                     songadapter.songlist=temp
+
+             }
+
+
+             for thread
+                    runnable= object :Runnable {
+                         override fun run() {
+                             var han = Handler(Looper.getMainLooper())
+
+                             han.post(object : Runnable {
+                                 override fun run() {
+                                     Timer().schedule(object : TimerTask() {
+                                         override fun run() {
+                                             try {
+                                                  seekBar.progress = mp!!.currentPosition
+                                             } catch (e: Exception) {
+                                             }
+                                         }
+                                     }, 0,0)
+                                 }
+
+                             })
+
+                         }
+                     }
