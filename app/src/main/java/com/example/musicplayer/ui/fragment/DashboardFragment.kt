@@ -455,7 +455,7 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
 
                 han.post(object : Runnable {
                     override fun run() {
-                        Log.d("@the", Thread.currentThread().name)
+
                         Timer().schedule(object : TimerTask() {
                             override fun run() {
                                 try {
@@ -467,7 +467,7 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
                                         play.visibility = View.VISIBLE
                                         pause.visibility = View.INVISIBLE
                                     }
-
+                                    Log.d("@the", start.text.toString())
                                     seekBar.progress = mp!!.currentPosition
                                     if (start.text == end.text) {
                                         mp?.stop()
