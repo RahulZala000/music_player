@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
 import android.database.Cursor
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
@@ -34,6 +35,7 @@ import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.android.synthetic.main.layout_playsheet.*
 import kotlinx.android.synthetic.main.layout_playsheet.view.*
 import java.util.*
+import kotlin.properties.Delegates
 
 
 class DashboardFragment : BaseFragment(), ServiceConnection {
@@ -49,7 +51,7 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
     var audiolist=ArrayList<SongResponse>()
     lateinit var tempsong:SongResponse
     lateinit var songadapter:SonglistAdapter
-    var pos:Int=0
+    var pos=0
     var keep:String=""
 //    lateinit var runnable:Runnable
     lateinit var time:Thread
@@ -74,24 +76,17 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
 
     override fun setupUI() {
 
-        if(mp!=null) {
-            play.visibility = View.INVISIBLE
-            pause.visibility=View.VISIBLE
-        }
-        else{
-            play.visibility = View.VISIBLE
-            pause.visibility=View.INVISIBLE
-        }
 
-        if(mp!=null) {
+
+     /*   if(mp!=null) {
             mp!!.setOnCompletionListener {
                 if (it != null) {
                     mp!!.isLooping = false
-                    mp = media(audiolist.get(++pos))
+                    mp = media(audiolist.get(++pos!!))
                     mp!!.start()
                 }
             }
-        }
+        }*/
 
 
 
@@ -99,15 +94,15 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
             override fun onProgressChanged(p0: SeekBar?, seek: Int, p2: Boolean) {
 
                     start.text=timeduration(seek)
-                    mp!!.seekTo(seek)
+              //      mp!!.seekTo(seek)
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {
 
             }
 
-            override fun onStopTrackingTouch(p0: SeekBar?) {
-
+            override fun onStopTrackingTouch(v: SeekBar?) {
+                mp!!.seekTo(v!!.progress)
             }
 
         })
@@ -149,6 +144,8 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
         fetch_song()
         search()
         speech()
+        time=thread()
+        time.start()
 
     }
 
@@ -161,12 +158,11 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
              keep=""
 
            if(mp==null){
+               pos=0
                tempsong=audiolist.get(pos)
                mp=media(tempsong)
            }
-          // start.text=timeduration(mp!!.currentPosition)
 
-           seekBar.progress=mp!!.currentPosition
             mp?.start()
 
         }
@@ -176,15 +172,12 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
            speechRecognizer.stopListening()
             mp?.pause()
 
-
-
-
         }
 
         next.setOnLongClickListener(object :View.OnLongClickListener{
             override fun onLongClick(p0: View?): Boolean {
                 if(mp!=null) {
-                    seekBar.progress=mp!!.currentPosition+10000
+                    mp!!.seekTo(mp!!.currentPosition+10000)
                 }
                 return true
             }
@@ -194,8 +187,7 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
         preview.setOnLongClickListener(object :View.OnLongClickListener{
             override fun onLongClick(p0: View?): Boolean {
                 if(mp!=null) {
-                    seekBar.progress=mp!!.currentPosition-10000
-                    Toast.makeText(requireContext(), start.text, Toast.LENGTH_SHORT).show()
+                    mp!!.seekTo(mp!!.currentPosition-10000)
                 }
                 return true
             }
@@ -214,7 +206,6 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
 
             tempsong=audiolist.get(pos)
             mp=media(tempsong)
-            mp?.start()
             play.visibility=View.INVISIBLE
             pause.visibility=View.VISIBLE
         }
@@ -357,21 +348,17 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
 
             override fun onItemClick(view: View?, Pos: Int, Song: Any?) {
                 tempsong = Song as SongResponse
-                pos=Pos
+                if (Pos != pos) pos = Pos
+                else pos=0
 
-                if(mp!=null)
-                {
-                    pause.visibility=View.INVISIBLE
-                    play.visibility=View.VISIBLE
+
+                    mp?.stop()
+                    mp?.prepare()
+                    mp = media(tempsong)
+                    pause.visibility = View.VISIBLE
+                    play.visibility = View.INVISIBLE
+                    mp?.start()
                 }
-
-                mp?.stop()
-                mp?.release()
-                mp= media(tempsong)
-                pause.visibility=View.VISIBLE
-                play.visibility=View.INVISIBLE
-                mp?.start()
-            }
         })
         song.adapter=songadapter
 
@@ -433,41 +420,20 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
     {
         var uri:Uri=Uri.parse(temp.path)
         playsheet.songname.text=temp.songname
-        mp= MediaPlayer.create(requireContext(),uri)
+
+        mp=MediaPlayer.create(requireContext(),uri)
         seekBar.max=mp!!.duration
-        start.text=timeduration(mp?.currentPosition!!)
-        end.text=timeduration(mp?.duration!!)
+        start.text=timeduration(mp!!.currentPosition)
+        end.text=timeduration(mp!!.duration)
         seekBar.progress=mp!!.currentPosition
 
-       time=Thread( object :Runnable {
-            override fun run() {
-                var han = Handler(Looper.getMainLooper())
+        mp!!.start()
 
-                han.post(object : Runnable {
-                    override fun run() {
-                        Timer().schedule(object : TimerTask() {
-                            override fun run() {
-                                try {
-
-                                    Log.d("@th",timeduration(mp!!.currentPosition))
-                                   // seekBar.progress = mp!!.currentPosition
-                                    han.postDelayed(this,0)
-                                } catch (e: Exception) {
-                                }
-                            }
-                        }, 0,1000)
-                    }
-
-                })
-
-            }
-        })
 
 
 
 
        // time= Thread(runnable)
-        time.start()
 
         return mp!!
     }
@@ -481,6 +447,49 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
        musicService=null
     }
 
+    fun thread():Thread {
+
+       return  Thread(object : Runnable {
+            override fun run() {
+                var han = Handler(Looper.getMainLooper())
+
+                han.post(object : Runnable {
+                    override fun run() {
+                        Log.d("@the", Thread.currentThread().name)
+                        Timer().schedule(object : TimerTask() {
+                            override fun run() {
+                                try {
+
+                                    if (mp!!.isPlaying) {
+                                        play.visibility = View.INVISIBLE
+                                        pause.visibility = View.VISIBLE
+                                    } else {
+                                        play.visibility = View.VISIBLE
+                                        pause.visibility = View.INVISIBLE
+                                    }
+
+                                    seekBar.progress = mp!!.currentPosition
+                                    if (start.text == end.text) {
+                                        mp?.stop()
+                                        mp?.prepare()
+                                        if (audiolist.size - 1 > pos) ++pos
+                                        else pos = 0
+
+                                        tempsong = audiolist.get(pos)
+                                        mp = media(tempsong)
+                                    }
+                                } catch (e: Exception) {
+                                    e.message
+                                }
+                            }
+                        }, 0, 1000)
+                    }
+
+                })
+
+            }
+        })
+    }
 }
 
 
