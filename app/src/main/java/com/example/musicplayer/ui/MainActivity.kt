@@ -56,29 +56,26 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun start_thread()
-    {
-
-    }
-
-    fun end_thread()
-    {
-
-    }
-
     private fun setupUi() {
+
+        var s=intent.getStringExtra("Notify")
         navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_frag) as NavHostFragment
         navController = navHostFragment.navController
 
-        //   val navGraph = navController.navInflater.inflate(R.navigation.)
+        val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
 
-        //  navGraph.startde
-        //   navController.graph = navGraph
+      if(s=="Notify")
+          navGraph.startDestination=R.id.dashboardFragment
+        else
+            navGraph.startDestination=R.id.spalshFragment
+           navController.graph = navGraph
     }
 
     override fun onResume() {
         super.onResume()
+
+
     }
 
 }

@@ -5,6 +5,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.example.musicplayer.R
 import com.example.musicplayer.databinding.FragmentSpalshBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -45,9 +48,13 @@ class SpalshFragment : BaseFragment() {
     }
 
     private fun goToNextScreen() {
-        activityScope.launch {
+       /* activityScope.launch {
             delay(time)
               navigateTo(SpalshFragmentDirections.actionSpalshFragmentToDashboardFragment())
+        }
+*/
+        lifecycleScope.launchWhenResumed {
+            findNavController().navigate(R.id.action_spalshFragment_to_dashboardFragment)
         }
     }
 

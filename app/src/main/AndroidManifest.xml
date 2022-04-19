@@ -30,6 +30,8 @@
         </activity>
 
     <service android:name=".service.MusicService"/>
+        <receiver android:name=".service.NotificationReceive"
+            android:enabled="true" />
     </application>
 
 </manifest>

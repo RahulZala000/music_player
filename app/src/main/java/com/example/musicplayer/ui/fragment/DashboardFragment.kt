@@ -1,6 +1,8 @@
 package com.example.musicplayer.ui.fragment
 
+import android.app.ActivityManager
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.database.Cursor
@@ -38,7 +40,7 @@ import java.util.*
 import kotlin.properties.Delegates
 
 
-class DashboardFragment : BaseFragment(), ServiceConnection {
+class DashboardFragment : BaseFragment(),ServiceConnection {
 
     private var _binding: FragmentDashboardBinding? = null
     private val binding: FragmentDashboardBinding
@@ -65,63 +67,25 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
     ): View? {
        _binding=FragmentDashboardBinding.inflate(layoutInflater)
 
-
-
-     //   var intent=Intent(activity,MusicService::class.java)
-       // bindservice()
-
-
         return binding.root
     }
 
     override fun setupUI() {
 
-
-
-     /*   if(mp!=null) {
-            mp!!.setOnCompletionListener {
-                if (it != null) {
-                    mp!!.isLooping = false
-                    mp = media(audiolist.get(++pos!!))
-                    mp!!.start()
-                }
-            }
-        }*/
-
-
+        pause.visibility=View.INVISIBLE
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(p0: SeekBar?, seek: Int, p2: Boolean) {
-
                     start.text=timeduration(seek)
-              //      mp!!.seekTo(seek)
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {
-
             }
 
             override fun onStopTrackingTouch(v: SeekBar?) {
                 mp!!.seekTo(v!!.progress)
             }
-
         })
-
-      /*  val han=Handler()
-        han.postDelayed(object :Runnable{
-            override fun run() {
-                try {
-                   // start.text = timeduration(mp!!.currentPosition)
-                    seekBar.progress=mp!!.currentPosition
-                    Log.d("@thread",start.text.toString())
-                    han.postDelayed(this, 1000)
-                } catch (e: Exception) {
-                    start.text = "00:00"
-                    seekBar.progress = 0
-                }
-            }
-        },0)*/
-
 
         song.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
@@ -138,7 +102,6 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
                 }
                 return false
             }
-
         })
 
         fetch_song()
@@ -146,7 +109,6 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
         speech()
         time=thread()
         time.start()
-
     }
 
     override fun click()
@@ -162,7 +124,6 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
                tempsong=audiolist.get(pos)
                mp=media(tempsong)
            }
-
             mp?.start()
 
         }
@@ -181,7 +142,6 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
                 }
                 return true
             }
-
         })
 
         preview.setOnLongClickListener(object :View.OnLongClickListener{
@@ -191,10 +151,7 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
                 }
                 return true
             }
-
         })
-
-
 
         next.setOnClickListener{
 
@@ -413,6 +370,38 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
 
      }
 
+    fun Startstopservice(mp: MediaPlayer) {
+        var i:Intent?=null
+        if(Myservicerunning(MusicService::class.java))
+        {
+                Toast.makeText(requireContext(),"stopped", Toast.LENGTH_SHORT).show()
+                i=Intent(requireContext(),MusicService::class.java)
+         //   i.putExtra("music",mp.toString())
+                activity?.stopService(i)
+        }
+        else
+        {
+            Toast.makeText(requireContext(),"started", Toast.LENGTH_SHORT).show()
+            i=Intent(requireContext(),MusicService::class.java)
+
+
+            activity?.startService(i)
+
+        }
+    }
+
+    fun Myservicerunning(ser:Class<MusicService>):Boolean{
+
+        var manager=activity?.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
+        for(service: ActivityManager.RunningServiceInfo in manager.getRunningServices(Int.MAX_VALUE))
+        {
+            if(ser.name.equals(service.service.className))
+                return true
+        }
+        return false
+    }
+
 
 
 
@@ -422,6 +411,7 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
         playsheet.songname.text=temp.songname
 
         mp=MediaPlayer.create(requireContext(),uri)
+        Startstopservice(mp!!)
         seekBar.max=mp!!.duration
         start.text=timeduration(mp!!.currentPosition)
         end.text=timeduration(mp!!.duration)
@@ -440,7 +430,8 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
 
     override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
         val binder=p1 as MusicService.MyBinder
-        musicService=binder.currentservice()
+        musicService=binder.currservice()
+        musicService!!.Shownotification()
     }
 
     override fun onServiceDisconnected(p0: ComponentName?) {
