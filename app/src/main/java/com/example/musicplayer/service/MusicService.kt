@@ -97,16 +97,16 @@ class MusicService : Service() {
 
     fun Shownotification() {
 
-        var prevIntent=Intent(baseContext,NotificationReceive::class.java).setAction(MyApplication.not_pre)
+        var prevIntent=Intent(baseContext,NotificationReceive::class.java).setAction("PREV")
         var prevpeding=PendingIntent.getBroadcast(baseContext,0,prevIntent,PendingIntent.FLAG_UPDATE_CURRENT)
 
-        var nextIntent=Intent(baseContext,NotificationReceive::class.java).setAction(MyApplication.not_next)
+        var nextIntent=Intent(baseContext,NotificationReceive::class.java).setAction("NEXT")
         var nextpeding=PendingIntent.getBroadcast(baseContext,0,nextIntent,PendingIntent.FLAG_UPDATE_CURRENT)
 
-        var playIntent=Intent(baseContext,NotificationReceive::class.java).setAction(MyApplication.not_play)
+        var playIntent=Intent(baseContext,NotificationReceive::class.java).setAction("PLAY")
         var playpeding=PendingIntent.getBroadcast(baseContext,0,playIntent,PendingIntent.FLAG_UPDATE_CURRENT)
 
-        var pauseIntent=Intent(baseContext,NotificationReceive::class.java).setAction(MyApplication.not_pause)
+        var pauseIntent=Intent(baseContext,NotificationReceive::class.java).setAction("PAUSE")
         var pausepeding=PendingIntent.getBroadcast(baseContext,0,pauseIntent,PendingIntent.FLAG_UPDATE_CURRENT)
 
 
@@ -148,7 +148,7 @@ class MusicService : Service() {
     private fun createNotificationChannel(channelId: String, channelName: String): String{
         val chan = NotificationChannel(channelId,
             channelName, NotificationManager.IMPORTANCE_HIGH)
-        chan.lightColor = Color.BLUE
+        chan.lightColor = Color.RED
         chan.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         service.createNotificationChannel(chan)

@@ -10,8 +10,7 @@ import kotlin.coroutines.coroutineContext
 class NotificationReceive:BroadcastReceiver() {
     override fun onReceive(p0: Context?, intent: Intent) {
         when(intent?.action){
-            MyApplication.not_pause->{
-               // notificationManager.cancelAll();
+                       // notificationManager.cancelAll();
             }
         }
     }

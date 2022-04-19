@@ -31,6 +31,7 @@ import com.example.musicplayer.common.AdapterClickListerner
 import com.example.musicplayer.databinding.FragmentDashboardBinding
 import com.example.musicplayer.model.SongResponse
 import com.example.musicplayer.service.MusicService
+import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.android.synthetic.main.dashboard_toolbar.*
 import kotlinx.android.synthetic.main.dashboard_toolbar.view.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
@@ -58,6 +59,7 @@ class DashboardFragment : BaseFragment(),ServiceConnection {
 //    lateinit var runnable:Runnable
     lateinit var time:Thread
     var musicService:MusicService?=null
+
 
 
 
@@ -91,12 +93,12 @@ class DashboardFragment : BaseFragment(),ServiceConnection {
             override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
                 when (p1!!.action) {
                     MotionEvent.ACTION_DOWN -> {
-                        Toast.makeText(requireContext(), "start ", Toast.LENGTH_SHORT).show()
+                     //   Toast.makeText(requireContext(), "start ", Toast.LENGTH_SHORT).show()
                         speechRecognizer.startListening(speechintent)
                         keep = ""
                     }
                     MotionEvent.ACTION_UP -> {
-                        Toast.makeText(requireContext(), "done ", Toast.LENGTH_SHORT).show()
+                     //   Toast.makeText(requireContext(), "done ", Toast.LENGTH_SHORT).show()
                         speechRecognizer.stopListening()
                     }
                 }
@@ -124,7 +126,9 @@ class DashboardFragment : BaseFragment(),ServiceConnection {
                tempsong=audiolist.get(pos)
                mp=media(tempsong)
            }
+          activity?.startService(Intent(requireContext(),MusicService::class.java))
             mp?.start()
+
 
         }
         pause.setOnClickListener{
@@ -132,7 +136,7 @@ class DashboardFragment : BaseFragment(),ServiceConnection {
             pause.visibility=View.INVISIBLE
            speechRecognizer.stopListening()
             mp?.pause()
-
+            activity?.stopService(Intent(requireContext(),MusicService::class.java))
         }
 
         next.setOnLongClickListener(object :View.OnLongClickListener{
@@ -370,37 +374,7 @@ class DashboardFragment : BaseFragment(),ServiceConnection {
 
      }
 
-    fun Startstopservice(mp: MediaPlayer) {
-        var i:Intent?=null
-        if(Myservicerunning(MusicService::class.java))
-        {
-                Toast.makeText(requireContext(),"stopped", Toast.LENGTH_SHORT).show()
-                i=Intent(requireContext(),MusicService::class.java)
-         //   i.putExtra("music",mp.toString())
-                activity?.stopService(i)
-        }
-        else
-        {
-            Toast.makeText(requireContext(),"started", Toast.LENGTH_SHORT).show()
-            i=Intent(requireContext(),MusicService::class.java)
 
-
-            activity?.startService(i)
-
-        }
-    }
-
-    fun Myservicerunning(ser:Class<MusicService>):Boolean{
-
-        var manager=activity?.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-
-        for(service: ActivityManager.RunningServiceInfo in manager.getRunningServices(Int.MAX_VALUE))
-        {
-            if(ser.name.equals(service.service.className))
-                return true
-        }
-        return false
-    }
 
 
 
@@ -411,7 +385,7 @@ class DashboardFragment : BaseFragment(),ServiceConnection {
         playsheet.songname.text=temp.songname
 
         mp=MediaPlayer.create(requireContext(),uri)
-        Startstopservice(mp!!)
+        activity?.startService(Intent(requireContext(),MusicService::class.java))
         seekBar.max=mp!!.duration
         start.text=timeduration(mp!!.currentPosition)
         end.text=timeduration(mp!!.duration)
