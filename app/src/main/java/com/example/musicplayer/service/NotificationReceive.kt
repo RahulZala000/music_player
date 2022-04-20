@@ -11,34 +11,40 @@ import com.example.musicplayer.ui.fragment.DashboardFragment
 import kotlin.coroutines.coroutineContext
 import kotlin.system.exitProcess
 
-class NotificationReceive:BroadcastReceiver() {
+class NotificationReceive : BroadcastReceiver() {
+
     override fun onReceive(context: Context, intent: Intent) {
-        when(intent?.action){
-            Constant.PRE->{ Toast.makeText(context,"Play",Toast.LENGTH_SHORT).show() }
-            Constant.PLAY->{ if(DashboardFragment.musicService!!.mp!!.isPlaying) Playmusic()
-                else Pausemusic()
+        when (intent?.action) {
+            Constant.PRE -> {
+                Toast.makeText(context, "Play", Toast.LENGTH_SHORT).show()
+            }
+            Constant.PLAY -> {
+                if (DashboardFragment.musicService!!.mp!!.isPlaying) Pausemusic()
+                else Playmusic()
+              //  if(DashboardFragment.musicService==null) Playmusic()
             }
 
-            Constant.NEXT->{ Toast.makeText(context,"Play",Toast.LENGTH_SHORT).show() }
-            Constant.EXIT-> {
+            Constant.NEXT -> {
+                Toast.makeText(context, "Play", Toast.LENGTH_SHORT).show()
+            }
+            Constant.EXIT -> {
                 DashboardFragment.musicService!!.stopForeground(true)
-                DashboardFragment.musicService=null
+                DashboardFragment.musicService = null
                 exitProcess(1)
             }
-
-            }
-
-
-
         }
+    }
 
     private fun Playmusic() {
-            DashboardFragment.musicService!!.Shownotification(R.drawable.ic_pause_notification)
-            DashboardFragment.musicService!!.mp!!.stop()
-    }
-    private fun Pausemusic() {
-        DashboardFragment.musicService!!.Shownotification(R.drawable.ic_play_notification)
+
+        DashboardFragment.musicService!!.Shownotification(R.drawable.ic_pause_notification)
         DashboardFragment.musicService!!.mp!!.start()
+    }
+
+    private fun Pausemusic() {
+
+        DashboardFragment.musicService!!.Shownotification(R.drawable.ic_play_notification)
+        DashboardFragment.musicService!!.mp!!.pause()
     }
 
 

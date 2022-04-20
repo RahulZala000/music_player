@@ -24,6 +24,7 @@ import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.musicplayer.R
 import com.example.musicplayer.adapter.SonglistAdapter
 import com.example.musicplayer.common.AdapterClickListerner
 import com.example.musicplayer.databinding.FragmentDashboardBinding
@@ -403,7 +404,7 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
         musicService!!.mp = MediaPlayer.create(requireContext(), uri)
         serviceintent.putExtra("Pos", pos)
         seekBar.max = musicService?.mp!!.duration
-        musicService!!.Shownotification(pos)
+        musicService!!.Shownotification(R.drawable.ic_pause_notification)
         start.text = timeduration(musicService!!.mp!!.currentPosition)
         end.text = timeduration(musicService!!.mp!!.duration)
         seekBar.progress = musicService!!.mp!!.currentPosition
