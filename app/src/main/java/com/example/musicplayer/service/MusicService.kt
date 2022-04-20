@@ -91,21 +91,19 @@ class MusicService : Service() {
         return START_STICKY
     }
 
-    fun Shownotification(pos: Int) {
+    fun Shownotification(play: Int) {
 
-        var prevIntent=Intent(baseContext,NotificationReceive::class.java).setAction("PREV")
+        var prevIntent=Intent(baseContext,NotificationReceive::class.java).setAction(Constant.PRE)
         var prevpeding=PendingIntent.getBroadcast(baseContext,0,prevIntent,PendingIntent.FLAG_UPDATE_CURRENT)
 
-        var nextIntent=Intent(baseContext,NotificationReceive::class.java).setAction("NEXT")
+        var nextIntent=Intent(baseContext,NotificationReceive::class.java).setAction(Constant.NEXT)
         var nextpeding=PendingIntent.getBroadcast(baseContext,0,nextIntent,PendingIntent.FLAG_UPDATE_CURRENT)
 
-        var playIntent=Intent(baseContext,NotificationReceive::class.java).setAction("PLAY")
+        var playIntent=Intent(baseContext,NotificationReceive::class.java).setAction(Constant.PLAY)
         var playpeding=PendingIntent.getBroadcast(baseContext,0,playIntent,PendingIntent.FLAG_UPDATE_CURRENT)
 
-        var pauseIntent=Intent(baseContext,NotificationReceive::class.java).setAction("PAUSE")
-        var pausepeding=PendingIntent.getBroadcast(baseContext,0,pauseIntent,PendingIntent.FLAG_UPDATE_CURRENT)
 
-        var exitIntent=Intent(baseContext,NotificationReceive::class.java).setAction("EXIT")
+        var exitIntent=Intent(baseContext,NotificationReceive::class.java).setAction(Constant.EXIT)
         var exitpeding=PendingIntent.getBroadcast(baseContext,0,exitIntent,PendingIntent.FLAG_UPDATE_CURRENT)
 
 
@@ -123,13 +121,12 @@ class MusicService : Service() {
         }
         val notificationBuilder = NotificationCompat.Builder(this, s )
         val notification = notificationBuilder.setOngoing(true)
-
+            .setContentInfo(Constant.NOTIFICATION)
             .setSmallIcon(R.drawable.ic_music)
-            .setContentTitle(pos.toString())//DashboardFragment.audiolist[pos].songname
+            .setContentTitle(DashboardFragment.audiolist[DashboardFragment.pos].songname)//
             .setLargeIcon(BitmapFactory.decodeResource(resources,R.drawable.music_notes))
             .addAction(R.drawable.ic_previou, "Pre", prevpeding)
-            .addAction(R.drawable.ic_play, "Play", playpeding)
-            .addAction(R.drawable.ic_pause, "Pause", pausepeding)
+            .addAction(play, "Play", playpeding)
             .addAction(R.drawable.ic_next, "Next", nextpeding)
             .addAction(R.drawable.ic_exit,"Exit",exitpeding)
             .setContentIntent(pading_intent)
@@ -142,7 +139,7 @@ class MusicService : Service() {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             // .setCategory(Notification.EXTRA_MEDIA_SESSION)
             .build()
-        startForeground(100, notification)
+        startForeground(Constant.NOTIFICATION_ID, notification)
 
     }
 

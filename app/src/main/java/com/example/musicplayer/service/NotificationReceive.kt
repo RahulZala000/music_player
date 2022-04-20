@@ -6,14 +6,40 @@ import android.content.Intent
 import android.widget.Toast
 import com.example.musicplayer.MyApplication
 import com.example.musicplayer.R
+import com.example.musicplayer.common.Constant
+import com.example.musicplayer.ui.fragment.DashboardFragment
 import kotlin.coroutines.coroutineContext
+import kotlin.system.exitProcess
 
 class NotificationReceive:BroadcastReceiver() {
-    override fun onReceive(p0: Context?, intent: Intent) {
+    override fun onReceive(context: Context, intent: Intent) {
         when(intent?.action){
-               // R.drawable.ic_exit->{ }
+            Constant.PRE->{ Toast.makeText(context,"Play",Toast.LENGTH_SHORT).show() }
+            Constant.PLAY->{ if(DashboardFragment.musicService!!.mp!!.isPlaying) Playmusic()
+                else Pausemusic()
+            }
 
+            Constant.NEXT->{ Toast.makeText(context,"Play",Toast.LENGTH_SHORT).show() }
+            Constant.EXIT-> {
+                DashboardFragment.musicService!!.stopForeground(true)
+                DashboardFragment.musicService=null
+                exitProcess(1)
+            }
 
             }
+
+
+
         }
+
+    private fun Playmusic() {
+            DashboardFragment.musicService!!.Shownotification(R.drawable.ic_pause_notification)
+            DashboardFragment.musicService!!.mp!!.stop()
     }
+    private fun Pausemusic() {
+        DashboardFragment.musicService!!.Shownotification(R.drawable.ic_play_notification)
+        DashboardFragment.musicService!!.mp!!.start()
+    }
+
+
+}

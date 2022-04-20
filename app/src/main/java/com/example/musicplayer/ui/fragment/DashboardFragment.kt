@@ -38,7 +38,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class DashboardFragment : BaseFragment(), ServiceConnection {
+public class DashboardFragment : BaseFragment(), ServiceConnection {
 
     private var _binding: FragmentDashboardBinding? = null
     private val binding: FragmentDashboardBinding
@@ -54,12 +54,14 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
     lateinit var songadapter: SonglistAdapter
 
     var keep: String = ""
-    var pos =0
+
     lateinit var time: Thread
-    var musicService: MusicService? = null
+
 
     companion object {
         var audiolist = ArrayList<SongResponse>()
+        var pos =0
+        var musicService: MusicService? = null
 
     }
 
@@ -70,32 +72,27 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
     ): View? {
         _binding = FragmentDashboardBinding.inflate(layoutInflater)
 
-
         return binding.root
     }
 
-    override fun onStart() {
-        super.onStart()
 
 
-    }
 
-
-    override fun onPause() {
+/*    override fun onPause() {
         super.onPause()
-        /*  if(MusicService!=null)
-              mp!!.pause()*/
+        *//*  if(MusicService!=null)
+              mp!!.pause()*//*
     }
 
     override fun onResume() {
         super.onResume()
         Log.d("@Music","success")
-        /*   if(musicService!!.mp!=null)
+        *//*   if(musicService!!.mp!=null)
                Log.d("@Music","success")
     //  musicService!!.mp?.start()
         else
-               Log.d("@Music","fails")*/
-    }
+               Log.d("@Music","fails")*//*
+    }*/
 
     override fun setupUI() {
 
@@ -145,11 +142,9 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
         time.start()
     }
 
-    fun stopser() {
-        activity?.stopService(Intent(requireContext(), MusicService::class.java))
-    }
 
     override fun click() {
+
         play.setOnClickListener {
             play.visibility = View.INVISIBLE
             pause.visibility = View.VISIBLE
@@ -199,6 +194,7 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
             musicService!!.mp?.stop()
             musicService!!.mp?.reset()
             media()
+
             play.visibility = View.INVISIBLE
             pause.visibility = View.VISIBLE
         }
@@ -336,7 +332,6 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
             override fun onItemClick(view: View?, Pos: Int) {
 
                 if (Pos != pos) pos = Pos
-                else pos = 0
 
 
                 musicService!!.mp?.stop()
@@ -408,6 +403,7 @@ class DashboardFragment : BaseFragment(), ServiceConnection {
         musicService!!.mp = MediaPlayer.create(requireContext(), uri)
         serviceintent.putExtra("Pos", pos)
         seekBar.max = musicService?.mp!!.duration
+        musicService!!.Shownotification(pos)
         start.text = timeduration(musicService!!.mp!!.currentPosition)
         end.text = timeduration(musicService!!.mp!!.duration)
         seekBar.progress = musicService!!.mp!!.currentPosition
