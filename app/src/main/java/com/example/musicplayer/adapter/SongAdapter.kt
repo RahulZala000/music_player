@@ -26,7 +26,7 @@ class SongAdapter(var songlist: ArrayList<SongResponse>,var click: AdapterClickL
         holder.binding.song.text=item.songname
 
         holder.binding.song.setOnClickListener {
-            click.onItemClick(it,position,item.songname)
+            click.onItemClick(it,position)
         }
     }
 

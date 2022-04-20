@@ -6,8 +6,10 @@
         <entry key="..\:/music_player/app/src/main/res/layout/layout_song.xml" value="0.20416666666666666" />
         <entry key="app/src/main/res/drawable-v24/ic_channel_foreground.xml" value="0.1984375" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.34791666666666665" />
+        <entry key="app/src/main/res/drawable/ic_exit.xml" value="0.1785" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.34791666666666665" />
         <entry key="app/src/main/res/drawable/ic_menu.xml" value="0.242" />
+        <entry key="app/src/main/res/drawable/ic_next.xml" value="0.193" />
         <entry key="app/src/main/res/drawable/ic_pause.xml" value="0.2165" />
         <entry key="app/src/main/res/drawable/ic_play.xml" value="0.2165" />
         <entry key="app/src/main/res/drawable/ic_search.xml" value="0.242" />

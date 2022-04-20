@@ -23,6 +23,7 @@ import android.view.View
 import androidx.annotation.MainThread
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationCompat.PRIORITY_MAX
 import androidx.core.app.NotificationCompat.PRIORITY_MIN
 import androidx.core.content.PackageManagerCompat.LOG_TAG
 import androidx.media.MediaBrowserServiceCompat
@@ -47,8 +48,9 @@ class MusicService : Service() {
 
     var binder=MyBinder()
     var mp: MediaPlayer? = null
-     var mediasession: MediaSessionCompat?=null
-
+    var mediasession: MediaSessionCompat?=null
+    var pos:Int=0
+//
     val controller = mediasession?.controller
     val mediaMetadata = controller?.metadata
     val description = mediaMetadata?.description
@@ -60,7 +62,6 @@ class MusicService : Service() {
     lateinit var songadapter: SonglistAdapter
 
     override fun onBind(p0: Intent?): IBinder? {
-        mediasession= MediaSessionCompat(baseContext,"My Music")
         return binder
     }
 
@@ -70,20 +71,15 @@ class MusicService : Service() {
         }
     }
 
-
-
     override fun onCreate() {
         super.onCreate()
         initMusic()
-
-
-
 
     }
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Shownotification()
+       // Shownotification()
         if (mp != null) {
             if (mp!!.isPlaying)
                 mp!!.stop()
@@ -95,7 +91,7 @@ class MusicService : Service() {
         return START_STICKY
     }
 
-    fun Shownotification() {
+    fun Shownotification(pos: Int) {
 
         var prevIntent=Intent(baseContext,NotificationReceive::class.java).setAction("PREV")
         var prevpeding=PendingIntent.getBroadcast(baseContext,0,prevIntent,PendingIntent.FLAG_UPDATE_CURRENT)
@@ -109,6 +105,9 @@ class MusicService : Service() {
         var pauseIntent=Intent(baseContext,NotificationReceive::class.java).setAction("PAUSE")
         var pausepeding=PendingIntent.getBroadcast(baseContext,0,pauseIntent,PendingIntent.FLAG_UPDATE_CURRENT)
 
+        var exitIntent=Intent(baseContext,NotificationReceive::class.java).setAction("EXIT")
+        var exitpeding=PendingIntent.getBroadcast(baseContext,0,exitIntent,PendingIntent.FLAG_UPDATE_CURRENT)
+
 
 
         var notification_intent = Intent(this, MainActivity::class.java)
@@ -116,7 +115,7 @@ class MusicService : Service() {
 
         var pading_intent = PendingIntent.getActivity(this, 0, notification_intent, 0)
         var s= if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannel("my_service", "My Background Service")
+            createNotificationChannel("My_service", "My Background Service")
         }
         else
         {
@@ -126,30 +125,34 @@ class MusicService : Service() {
         val notification = notificationBuilder.setOngoing(true)
 
             .setSmallIcon(R.drawable.ic_music)
-            .setContentTitle("Track title")
-            .setLargeIcon(BitmapFactory.decodeResource(resources,R.id.spalshFragment))
+            .setContentTitle(pos.toString())//DashboardFragment.audiolist[pos].songname
+            .setLargeIcon(BitmapFactory.decodeResource(resources,R.drawable.music_notes))
             .addAction(R.drawable.ic_previou, "Pre", prevpeding)
             .addAction(R.drawable.ic_play, "Play", playpeding)
             .addAction(R.drawable.ic_pause, "Pause", pausepeding)
             .addAction(R.drawable.ic_next, "Next", nextpeding)
+            .addAction(R.drawable.ic_exit,"Exit",exitpeding)
             .setContentIntent(pading_intent)
             .setStyle(
                 androidx.media.app.NotificationCompat.MediaStyle()
-                 .setMediaSession(mediasession?.sessionToken)
+                    .setMediaSession(mediasession?.sessionToken)
             )
-  //          .setPriority(IMPO)
-            .setCategory(Notification.EXTRA_MEDIA_SESSION)
+            .setPriority(PRIORITY_MAX)
+            .setOnlyAlertOnce(true)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            // .setCategory(Notification.EXTRA_MEDIA_SESSION)
             .build()
-        startForeground(Constant.NOTIFICATION_ID, notification)
+        startForeground(100, notification)
 
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(channelId: String, channelName: String): String{
         val chan = NotificationChannel(channelId,
             channelName, NotificationManager.IMPORTANCE_HIGH)
-        chan.lightColor = Color.RED
-        chan.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        chan.lightColor = Color.BLUE
+        chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
         val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         service.createNotificationChannel(chan)
         return channelId
@@ -158,7 +161,7 @@ class MusicService : Service() {
     private fun initMusic() {
 
         if (mp != null) {
-            mp = DashboardFragment().mp!!
+          //  mp = DashboardFragment().mp!!
             mp!!.isLooping = false
 
             mp!!.setVolume(100f, 100f)

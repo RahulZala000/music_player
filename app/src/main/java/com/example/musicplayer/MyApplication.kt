@@ -7,7 +7,7 @@ import android.os.Build
 
 class MyApplication:Application() {
     companion object{
-        const val not_id="ch1"
+        const val not_id="My_service"
         const val not_play="Play"
         const val not_pause="Pause"
         const val not_next="Next"
