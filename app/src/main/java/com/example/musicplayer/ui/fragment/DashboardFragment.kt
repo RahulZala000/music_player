@@ -24,6 +24,7 @@ import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.musicplayer.R
 import com.example.musicplayer.adapter.SonglistAdapter
 import com.example.musicplayer.common.AdapterClickListerner
 import com.example.musicplayer.databinding.FragmentDashboardBinding
@@ -99,7 +100,6 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
         pause.visibility = View.INVISIBLE
 
         serviceintent = Intent(requireContext(), MusicService::class.java)
-        Log.d("@Ser", "service is start")
         activity?.bindService(serviceintent, this, Context.BIND_AUTO_CREATE)
         activity?.startService(serviceintent)
 
@@ -146,8 +146,6 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
     override fun click() {
 
         play.setOnClickListener {
-            play.visibility = View.INVISIBLE
-            pause.visibility = View.VISIBLE
             speechRecognizer.startListening(speechintent)
             keep = ""
 
@@ -161,8 +159,6 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
 
         }
         pause.setOnClickListener {
-            play.visibility = View.VISIBLE
-            pause.visibility = View.INVISIBLE
             speechRecognizer.stopListening()
             musicService!!.mp?.pause()
             //   activity?.stopService(Intent(requireContext(),MusicService::class.java))
@@ -194,9 +190,6 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
             musicService!!.mp?.stop()
             musicService!!.mp?.reset()
             media()
-
-            play.visibility = View.INVISIBLE
-            pause.visibility = View.VISIBLE
         }
 
         preview.setOnClickListener {
@@ -337,25 +330,22 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
                 musicService!!.mp?.stop()
                 musicService!!.mp?.prepare()
                 media()
-                pause.visibility = View.VISIBLE
-                play.visibility = View.INVISIBLE
                 musicService!!.mp?.start()
             }
         })
         song.adapter = songadapter
 
         return temp
-
     }
 
     fun search() {
 
         var temp: ArrayList<SongResponse> = ArrayList()
 
-        search_song.setOnQueryTextFocusChangeListener(object : SearchView.OnQueryTextListener,
+        binding.toolbar.search.setOnQueryTextFocusChangeListener(object : SearchView.OnQueryTextListener,
             View.OnFocusChangeListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                Log.d("@Tag", query.toString())
+                Log.d("@Tag", query!!)
                 for (d in audiolist) {
                     if (query.toString()?.contains(d.songname.toString()))
                         temp.add(d)
@@ -369,7 +359,7 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                Log.d("@Tagg", newText.toString())
+                Log.d("@Tagg", newText!!)
 
 
                 for (d in audiolist) {
@@ -385,9 +375,9 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
 
             override fun onFocusChange(p0: View?, p1: Boolean) {
                 if (p1)
-                    toolbar.name.visibility = View.INVISIBLE
+                   binding.toolbar.name.visibility = View.INVISIBLE
                 else
-                    toolbar.name.visibility = View.VISIBLE
+                   binding.toolbar.name.visibility = View.VISIBLE
             }
 
         })
@@ -396,14 +386,15 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
 
 
     fun media() {
-        var uri: Uri = Uri.parse(audiolist[pos].path)
-       binding.playsheet.songname.text = audiolist[pos].songname//emp.songname
 
-        serviceintent.putExtra("Pos", pos)
+        var uri: Uri = Uri.parse(audiolist[pos].path)
+        binding.playsheet.songname.text = audiolist[pos].songname//emp.songname
+
         musicService!!.mp = MediaPlayer.create(requireContext(), uri)
-        serviceintent.putExtra("Pos", pos)
-        seekBar.max = musicService?.mp!!.duration
         musicService!!.Shownotification(pos)
+
+        seekBar.max = musicService?.mp!!.duration
+        musicService!!.Shownotification(R.drawable.ic_pause_notification)
         start.text = timeduration(musicService!!.mp!!.currentPosition)
         end.text = timeduration(musicService!!.mp!!.duration)
         seekBar.progress = musicService!!.mp!!.currentPosition
@@ -414,10 +405,7 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
     override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
         val binder = p1 as MusicService.MyBinder
         musicService = binder.currservice()
-        /*if(pos!=0)
-        media()*/
-        musicService!!.Shownotification(pos)
-
+        musicService!!.Shownotification(R.drawable.ic_play_notification)
     }
 
     override fun onServiceDisconnected(p0: ComponentName?) {
@@ -440,20 +428,22 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
                                     if (musicService!!.mp!!.isPlaying) {
                                         play.visibility = View.INVISIBLE
                                         pause.visibility = View.VISIBLE
+                                        musicService!!.Shownotification(R.drawable.ic_pause_notification)
                                     } else {
                                         play.visibility = View.VISIBLE
                                         pause.visibility = View.INVISIBLE
+                                        musicService!!.Shownotification(R.drawable.ic_play_notification)
                                     }
                                     Log.d("@the", start.text.toString())
                                     seekBar.progress = musicService!!.mp!!.currentPosition
-                                    if (start.text == end.text) {
+                                 /*   if (musicService!!.mp!!.currentPosition== musicService!!.mp!!.duration) {
                                         musicService!!.mp?.stop()
                                         musicService!!.mp?.prepare()
                                         if (audiolist.size - 1 > pos) ++pos
                                         else pos = 0
 
                                         media()
-                                    }
+                                    }*/
                                 } catch (e: Exception) {
                                     e.message
                                 }

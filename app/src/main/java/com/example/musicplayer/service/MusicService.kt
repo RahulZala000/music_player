@@ -79,13 +79,13 @@ class MusicService : Service() {
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-       // Shownotification()
-        if (mp != null) {
+
+      /*  if (mp != null) {
             if (mp!!.isPlaying)
                 mp!!.stop()
             else
                 mp!!.start()
-        }
+        }*/
 
 
         return START_STICKY
@@ -134,7 +134,7 @@ class MusicService : Service() {
                 androidx.media.app.NotificationCompat.MediaStyle()
                     .setMediaSession(mediasession?.sessionToken)
             )
-            .setPriority(PRIORITY_MAX)
+            .setPriority(PRIORITY_MIN)
             .setOnlyAlertOnce(true)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             // .setCategory(Notification.EXTRA_MEDIA_SESSION)
@@ -144,12 +144,14 @@ class MusicService : Service() {
     }
 
 
+
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(channelId: String, channelName: String): String{
         val chan = NotificationChannel(channelId,
-            channelName, NotificationManager.IMPORTANCE_HIGH)
+            channelName, NotificationManager.IMPORTANCE_MIN)
         chan.lightColor = Color.BLUE
-        chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+        chan.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         service.createNotificationChannel(chan)
         return channelId

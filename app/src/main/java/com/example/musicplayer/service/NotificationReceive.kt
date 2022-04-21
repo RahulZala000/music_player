@@ -12,33 +12,41 @@ import kotlin.coroutines.coroutineContext
 import kotlin.system.exitProcess
 
 class NotificationReceive:BroadcastReceiver() {
+
+    var mp=DashboardFragment()
     override fun onReceive(context: Context, intent: Intent) {
         when(intent?.action){
-            Constant.PRE->{ Toast.makeText(context,"Play",Toast.LENGTH_SHORT).show() }
-            Constant.PLAY->{ if(DashboardFragment.musicService!!.mp!!.isPlaying) Playmusic()
-                else Pausemusic()
+            Constant.PRE->{ DashboardFragment.musicService!!.pos-=1 }
+            Constant.PLAY->{ if(DashboardFragment.musicService!!.mp!!.isPlaying) Pausemusic()
+                else Playmusic()
             }
 
-            Constant.NEXT->{ Toast.makeText(context,"Play",Toast.LENGTH_SHORT).show() }
+            Constant.NEXT->{ DashboardFragment.musicService!!.pos-=1 }
             Constant.EXIT-> {
                 DashboardFragment.musicService!!.stopForeground(true)
                 DashboardFragment.musicService=null
                 exitProcess(1)
             }
-
-            }
-
-
-
+        }
         }
 
     private fun Playmusic() {
+
+        if(DashboardFragment.musicService!!.mp==null)
+        {
+            DashboardFragment.pos=0
+            mp.media()
+
+        }
+        else{
             DashboardFragment.musicService!!.Shownotification(R.drawable.ic_pause_notification)
-            DashboardFragment.musicService!!.mp!!.stop()
+            DashboardFragment.musicService!!.mp!!.start()
+        }
+
     }
     private fun Pausemusic() {
         DashboardFragment.musicService!!.Shownotification(R.drawable.ic_play_notification)
-        DashboardFragment.musicService!!.mp!!.start()
+        DashboardFragment.musicService!!.mp!!.pause()
     }
 
 
