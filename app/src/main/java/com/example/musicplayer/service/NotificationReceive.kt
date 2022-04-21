@@ -21,13 +21,17 @@ class NotificationReceive:BroadcastReceiver() {
                 else Playmusic()
             }
 
-            Constant.NEXT->{ DashboardFragment.musicService!!.pos-=1 }
+            Constant.NEXT->{ Toast.makeText(context,"Play",Toast.LENGTH_SHORT).show() }
             Constant.EXIT-> {
                 DashboardFragment.musicService!!.stopForeground(true)
                 DashboardFragment.musicService=null
                 exitProcess(1)
             }
-        }
+
+            }
+
+
+
         }
 
     private fun Playmusic() {
@@ -46,7 +50,7 @@ class NotificationReceive:BroadcastReceiver() {
     }
     private fun Pausemusic() {
         DashboardFragment.musicService!!.Shownotification(R.drawable.ic_play_notification)
-        DashboardFragment.musicService!!.mp!!.pause()
+        DashboardFragment.musicService!!.mp!!.start()
     }
 
 

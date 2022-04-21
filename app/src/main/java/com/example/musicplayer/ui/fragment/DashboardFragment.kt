@@ -24,6 +24,7 @@ import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.musicplayer.R
 import com.example.musicplayer.adapter.SonglistAdapter
 import com.example.musicplayer.common.AdapterClickListerner
 import com.example.musicplayer.databinding.FragmentDashboardBinding
@@ -387,8 +388,9 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
     fun media() {
 
         var uri: Uri = Uri.parse(audiolist[pos].path)
-        binding.playsheet.songname.text = audiolist[pos].songname//emp.songname
+       binding.playsheet.songname.text = audiolist[pos].songname//emp.songname
 
+        serviceintent.putExtra("Pos", pos)
         musicService!!.mp = MediaPlayer.create(requireContext(), uri)
         musicService!!.Shownotification(pos)
 
@@ -404,7 +406,6 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
     override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
         val binder = p1 as MusicService.MyBinder
         musicService = binder.currservice()
-        musicService!!.Shownotification(R.drawable.ic_play_notification)
     }
 
     override fun onServiceDisconnected(p0: ComponentName?) {
@@ -435,14 +436,14 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
                                     }
                                     Log.d("@the", start.text.toString())
                                     seekBar.progress = musicService!!.mp!!.currentPosition
-                                 /*   if (musicService!!.mp!!.currentPosition== musicService!!.mp!!.duration) {
+                                    if (start.text == end.text) {
                                         musicService!!.mp?.stop()
                                         musicService!!.mp?.prepare()
                                         if (audiolist.size - 1 > pos) ++pos
                                         else pos = 0
 
                                         media()
-                                    }*/
+                                    }
                                 } catch (e: Exception) {
                                     e.message
                                 }
