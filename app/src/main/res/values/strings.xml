@@ -3,7 +3,7 @@
     <string name="music_player_title">Music Player</string>
     <string name="music_player_logo_description">Music_Player_Logo_Description</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="filename">File Name</string>
-    <string name="song_name">Song Name</string>
+    <string name="hello_blank_fragment">Helloblankfragment</string>
+    <string name="filename">FileName</string>
+    <string name="song_name">SongName</string>
 </resources>

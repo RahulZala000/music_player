@@ -3,6 +3,7 @@ package com.example.musicplayer.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.widget.Toast
 import com.example.musicplayer.MyApplication
 import com.example.musicplayer.R
@@ -30,27 +31,29 @@ class NotificationReceive:BroadcastReceiver() {
 
             }
 
-
+        if (intent.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY) {
+            DashboardFragment.musicService!!.mp!!.pause()
+        }
 
         }
 
     private fun Playmusic() {
 
-        if(DashboardFragment.musicService!!.mp==null)
+        /*if(DashboardFragment.musicService!!.mp==null)
         {
             DashboardFragment.pos=0
             mp.media()
 
-        }
-        else{
+        }*/
+      //  else{
             DashboardFragment.musicService!!.Shownotification(R.drawable.ic_pause_notification)
             DashboardFragment.musicService!!.mp!!.start()
-        }
+      //  }
 
     }
     private fun Pausemusic() {
         DashboardFragment.musicService!!.Shownotification(R.drawable.ic_play_notification)
-        DashboardFragment.musicService!!.mp!!.start()
+        DashboardFragment.musicService!!.mp!!.pause()
     }
 
 
