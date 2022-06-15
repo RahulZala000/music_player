@@ -6,4 +6,7 @@
     <string name="hello_blank_fragment">Helloblankfragment</string>
     <string name="filename">FileName</string>
     <string name="song_name">SongName</string>
+    <string name="offline">Offline</string>
+    <string name="tr">Again Try To Data Load</string>
+    <string name="wrong">something_went_wrong</string>
 </resources>

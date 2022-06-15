@@ -10,19 +10,12 @@
         android:id="@+id/toolbar"
         layout="@layout/dashboard_toolbar" />
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/_10sdp"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="322dp">
-
-    </androidx.cardview.widget.CardView>
 
     <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/offline"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clickable="true"
         android:orientation="vertical"
         android:padding="@dimen/_10sdp"
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
@@ -38,13 +31,26 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <include
-        android:id="@+id/playsheet"
-        layout="@layout/layout_playsheet"
 
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/song"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
+        app:layout_constraintTop_toBottomOf="@+id/offline"
         app:layout_constraintVertical_bias="0.0"
         tools:layout_editor_absoluteX="0dp" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <include
+            android:id="@+id/playsheet"
+            layout="@layout/layout_playsheet" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
