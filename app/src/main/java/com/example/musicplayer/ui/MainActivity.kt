@@ -6,6 +6,7 @@ import android.database.Cursor
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.widget.BaseAdapter
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
@@ -13,9 +14,11 @@ import androidx.navigation.fragment.NavHostFragment
 import com.example.musicplayer.R
 import com.example.musicplayer.adapter.SongAdapter
 import com.example.musicplayer.databinding.ActivityMainBinding
+import com.example.musicplayer.ui.fragment.BaseActivity
 import dagger.hilt.android.AndroidEntryPoint
 
-class MainActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class MainActivity : BaseActivity() {
 
     lateinit var navHostFragment: NavHostFragment
     lateinit var navController: NavController

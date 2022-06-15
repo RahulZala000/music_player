@@ -7,10 +7,7 @@ import android.content.ServiceConnection
 import android.database.Cursor
 import android.media.MediaPlayer
 import android.net.Uri
-import android.os.Bundle
-import android.os.Handler
-import android.os.IBinder
-import android.os.Looper
+import android.os.*
 import android.provider.MediaStore
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
@@ -30,6 +27,7 @@ import com.example.musicplayer.common.AdapterClickListerner
 import com.example.musicplayer.databinding.FragmentDashboardBinding
 import com.example.musicplayer.model.SongResponse
 import com.example.musicplayer.service.MusicService
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.dashboard_toolbar.*
 import kotlinx.android.synthetic.main.dashboard_toolbar.view.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
@@ -39,13 +37,13 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-public class DashboardFragment : BaseFragment(), ServiceConnection {
+@AndroidEntryPoint
+ class DashboardFragment : BaseFragment(), ServiceConnection {
 
     private var _binding: FragmentDashboardBinding? = null
     private val binding: FragmentDashboardBinding
         get() = _binding!!
 
-    // var mp: MediaPlayer?=null
     lateinit var speechintent: Intent
     lateinit var speechRecognizer: SpeechRecognizer
     lateinit var serviceintent: Intent
@@ -153,7 +151,6 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
                 pos = 0
                 media()
             }
-          //  activity?.startService(serviceintent)
             musicService!!.mp?.start()
 
 
@@ -201,8 +198,6 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
             musicService!!.mp?.reset()
             media()
             musicService!!.mp?.start()
-            play.visibility = View.INVISIBLE
-            pause.visibility = View.VISIBLE
         }
 
 
@@ -312,7 +307,7 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
                 var songname = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.TITLE))
                 var ur = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DATA))
                 val falbum = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.ALBUM))
-                temp.add(SongResponse(songname, ur, falbum))
+                temp.add(SongResponse(0,songname, ur, falbum))
 
             }
             Log.d("@Data", audiolist.size.toString())
@@ -325,7 +320,6 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
             override fun onItemClick(view: View?, Pos: Int) {
 
                 if (Pos != pos) pos = Pos
-
 
                 musicService!!.mp?.stop()
                 musicService!!.mp?.prepare()
@@ -388,6 +382,7 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
     fun media() {
 
         var uri: Uri = Uri.parse(audiolist[pos].path)
+      //  var uri: Uri = Uri.parse("spotify:album:7wgrW5XyZdtk0K8PkW5A7h")
        binding.playsheet.songname.text = audiolist[pos].songname//emp.songname
 
         serviceintent.putExtra("Pos", pos)
@@ -401,7 +396,6 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
         seekBar.progress = musicService!!.mp!!.currentPosition
         musicService!!.mp!!.start()
     }
-
 
     override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
         val binder = p1 as MusicService.MyBinder
@@ -434,7 +428,7 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
                                         pause.visibility = View.INVISIBLE
                                         musicService!!.Shownotification(R.drawable.ic_play_notification)
                                     }
-                                    Log.d("@the", start.text.toString())
+                                //    Log.d("@the", start.text.toString())
                                     seekBar.progress = musicService!!.mp!!.currentPosition
                                     if (start.text == end.text) {
                                         musicService!!.mp?.stop()
@@ -456,6 +450,8 @@ public class DashboardFragment : BaseFragment(), ServiceConnection {
             }
         })
     }
+
+
 }
 
 

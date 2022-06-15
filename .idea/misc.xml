@@ -16,9 +16,9 @@
         <entry key="app/src/main/res/layout-v22/dashboard_toolbar.xml" value="0.3974358974358974" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.2222222222222222" />
         <entry key="app/src/main/res/layout/activity_muisc_view.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/dashboard_toolbar.xml" value="0.2712962962962963" />
+        <entry key="app/src/main/res/layout/dashboard_toolbar.xml" value="0.3587962962962963" />
         <entry key="app/src/main/res/layout/fragment_dashboard.xml" value="0.16753926701570682" />
-        <entry key="app/src/main/res/layout/fragment_home.xml" value="0.3587962962962963" />
+        <entry key="app/src/main/res/layout/fragment_home.xml" value="0.30412371134020616" />
         <entry key="app/src/main/res/layout/fragment_media.xml" value="0.3587962962962963" />
         <entry key="app/src/main/res/layout/fragment_spalsh.xml" value="0.3402061855670103" />
         <entry key="app/src/main/res/layout/layout_playsheet.xml" value="0.22916666666666666" />
@@ -28,7 +28,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_X" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_17_PREVIEW" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">
@@ -37,7 +37,7 @@
   <component name="VisualizationToolProject">
     <option name="state">
       <ProjectState>
-        <option name="scale" value="0.6134564643799473" />
+        <option name="scale" value="0.30412371134020616" />
       </ProjectState>
     </option>
   </component>

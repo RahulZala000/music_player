@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class SpalshFragment : BaseFragment() {
 
     private var _binding: FragmentSpalshBinding? = null
@@ -54,7 +55,7 @@ class SpalshFragment : BaseFragment() {
         }
 */
         lifecycleScope.launchWhenResumed {
-            findNavController().navigate(R.id.action_spalshFragment_to_dashboardFragment)
+            navigateTo(SpalshFragmentDirections.actionSpalshFragmentToDashboardFragment())
         }
     }
 

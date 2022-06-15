@@ -7,7 +7,7 @@ import com.example.musicplayer.common.AdapterClickListerner
 import com.example.musicplayer.databinding.LayoutSongBinding
 import com.example.musicplayer.model.SongResponse
 
-class SonglistAdapter(var songlist: ArrayList<SongResponse>,var itemclick:AdapterClickListerner): RecyclerView.Adapter<SonglistAdapter.MyViewHolder>(){
+class SonglistAdapter(var songlist: ArrayList<SongResponse>, var itemclick:AdapterClickListerner): RecyclerView.Adapter<SonglistAdapter.MyViewHolder>(){
 
     class MyViewHolder(var binding: LayoutSongBinding): RecyclerView.ViewHolder(binding.root)
 
