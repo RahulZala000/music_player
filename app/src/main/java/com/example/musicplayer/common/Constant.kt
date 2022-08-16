@@ -16,9 +16,5 @@ object Constant {
     const val PRE="Preview"
     const val EXIT="EXIT"
 
-    const val BASE_URL="https://spotify23.p.rapidapi.com/"
-
-    const val CLIENT_ID = "c9dab74eada74bfb9ea03a6c3ae5bc37"
-  //  const val  REDIRECT_URI = "com.tolkiana.spotifyplayer://callback"
 
 }

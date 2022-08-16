@@ -14,6 +14,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MIN
+import androidx.core.content.PackageManagerCompat.LOG_TAG
 import com.example.musicplayer.R
 import com.example.musicplayer.adapter.SonglistAdapter
 import com.example.musicplayer.common.AdapterClickListerner
@@ -58,6 +59,27 @@ class MusicService : Service() {
     override fun onCreate() {
         super.onCreate()
         initMusic()
+
+     /*   mediasession = MediaSessionCompat(baseContext, LOG_TAG).apply {
+
+            // Enable callbacks from MediaButtons and TransportControls
+            setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
+                    or MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
+            )
+
+            // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player
+            stateBuilder = PlaybackStateCompat.Builder()
+                .setActions(PlaybackStateCompat.ACTION_PLAY
+                        or PlaybackStateCompat.ACTION_PLAY_PAUSE
+                )
+            setPlaybackState(stateBuilder.build())
+*/
+            // MySessionCallback() has methods that handle callbacks from a media controller
+         //   setCallback(MySessionCallback())
+
+            // Set the session's token so that client activities can communicate with it.
+         //   setSessionToken(sessionToken)
+      //  }
 
     }
 
@@ -109,6 +131,7 @@ class MusicService : Service() {
             .setSmallIcon(R.drawable.ic_music)
             .setContentTitle(DashboardFragment.audiolist[DashboardFragment.pos].songname)//
             .setLargeIcon(BitmapFactory.decodeResource(resources,R.drawable.music_notes))
+            .setBadgeIconType(R.drawable.ic_music)
             .addAction(R.drawable.ic_previou, "Pre", prevpeding)
             .addAction(play, "Play", playpeding)
             .addAction(R.drawable.ic_next, "Next", nextpeding)

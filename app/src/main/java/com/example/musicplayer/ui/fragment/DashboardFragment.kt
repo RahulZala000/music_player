@@ -74,6 +74,11 @@ import kotlin.collections.ArrayList
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+
+    }
+
 
 
 
@@ -307,7 +312,7 @@ import kotlin.collections.ArrayList
                 var songname = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.TITLE))
                 var ur = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DATA))
                 val falbum = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.ALBUM))
-                temp.add(SongResponse(0,songname, ur, falbum))
+                temp.add(SongResponse(songname, ur, falbum))
 
             }
             Log.d("@Data", audiolist.size.toString())

@@ -2,12 +2,7 @@ package com.example.musicplayer.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.database.Cursor
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.MediaStore
-import android.widget.BaseAdapter
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -42,22 +37,7 @@ class MainActivity : BaseActivity() {
 
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if(requestCode==100 && grantResults[0]==PackageManager.PERMISSION_GRANTED)
-        {
-
-        }
-        if(requestCode==200 && grantResults[0]==PackageManager.PERMISSION_GRANTED)
-        {
-
-        }
-    }
 
     private fun setupUi() {
 
@@ -77,6 +57,7 @@ class MainActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+
 
 
     }
