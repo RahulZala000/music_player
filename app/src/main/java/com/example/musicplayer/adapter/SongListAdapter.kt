@@ -18,7 +18,7 @@ class SonglistAdapter(var songlist: ArrayList<SongResponse>, var itemclick:Adapt
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         var item=songlist[position]
 
-        holder.binding.song.text=item.songname
+        holder.binding.song.text=item.songName
 
         holder.binding.song.setOnClickListener {
             itemclick.onItemClick(it,position)
