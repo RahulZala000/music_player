@@ -5,82 +5,68 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.database.Cursor
-import android.media.MediaPlayer
 import android.net.Uri
 import android.os.*
 import android.provider.MediaStore
-import android.speech.RecognitionListener
-import android.speech.RecognizerIntent
-import android.speech.SpeechRecognizer
+import android.provider.MediaStore.Audio.Media
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.musicplayer.R
-import com.example.musicplayer.adapter.SonglistAdapter
-import com.example.musicplayer.common.AdapterClickListerner
+import com.example.musicplayer.adapter.SongListAdapter
 import com.example.musicplayer.databinding.FragmentDashboardBinding
 import com.example.musicplayer.model.SongResponse
 import com.example.musicplayer.service.MusicService
+import com.example.musicplayer.utils.CountDownTimerExt
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.dashboard_toolbar.*
-import kotlinx.android.synthetic.main.dashboard_toolbar.view.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import kotlinx.android.synthetic.main.layout_playsheet.*
-import kotlinx.android.synthetic.main.layout_playsheet.view.*
-import java.util.*
 import kotlin.collections.ArrayList
 
 
 @AndroidEntryPoint
- class DashboardFragment : BaseFragment(), ServiceConnection {
+class DashboardFragment : BaseFragment(), ServiceConnection {
 
     private var _binding: FragmentDashboardBinding? = null
     private val binding: FragmentDashboardBinding
         get() = _binding!!
 
-    lateinit var speechintent: Intent
-    lateinit var speechRecognizer: SpeechRecognizer
-    lateinit var serviceintent: Intent
+  //  private late init var speechIntent: Intent
+   // private late init var speechRecognizer: SpeechRecognizer
+    private lateinit var serviceIntent: Intent
 
+    private lateinit var songAdapter: SongListAdapter
 
-    lateinit var tempsong: SongResponse
-    lateinit var songadapter: SonglistAdapter
+    private var keep: String = ""
 
-    var keep: String = ""
+    private var currPlaySong:ArrayList<SongResponse> = ArrayList()
 
-    lateinit var time: Thread
-
+    private lateinit var timer: CountDownTimerExt
 
     companion object {
-        var audiolist = ArrayList<SongResponse>()
-        var pos =0
+        var audioList = ArrayList<SongResponse>()
+        var pos = 0
         var musicService: MusicService? = null
-
     }
 
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentDashboardBinding.inflate(layoutInflater)
+
 
         return binding.root
     }
-
-    override fun onResume() {
-        super.onResume()
-
-    }
-
-
-
 
 /*    override fun onPause() {
         super.onPause()
@@ -98,136 +84,140 @@ import kotlin.collections.ArrayList
                Log.d("@Music","fails")*//*
     }*/
 
+
+
+
+
     override fun setupUI() {
 
         pause.visibility = View.INVISIBLE
 
-        serviceintent = Intent(requireContext(), MusicService::class.java)
-        activity?.bindService(serviceintent, this, Context.BIND_AUTO_CREATE)
-        activity?.startService(serviceintent)
+        serviceIntent = Intent(requireContext(), MusicService::class.java)
+        activity?.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
+        activity?.startService(serviceIntent)
 
 
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, seek: Int, p2: Boolean) {
-                start.text = timeduration(seek)
+                start.text = timeDuration(seek)
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {
             }
 
             override fun onStopTrackingTouch(v: SeekBar?) {
-                musicService!!.mp!!.seekTo(v!!.progress)
-            }
-        })
-
-        song.setOnTouchListener(object : View.OnTouchListener {
-            override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
-                when (p1!!.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        //   Toast.makeText(requireContext(), "start ", Toast.LENGTH_SHORT).show()
-                        speechRecognizer.startListening(speechintent)
-                        keep = ""
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        //   Toast.makeText(requireContext(), "done ", Toast.LENGTH_SHORT).show()
-                        speechRecognizer.stopListening()
-                    }
+                if (musicService?.mp != null) {
+                    musicService?.mp?.seekTo(v!!.progress.toLong())
+                    // timer.mMillisInFuture=player!!.contentDuration-player!!.contentPosition
                 }
-                return false
             }
         })
 
-        audiolist=fetch_song()
-        search()
-        speech()
-        time = thread()
-        time.start()
+      /*  song.setOnTouchListener { _, p1 ->
+            when (p1!!.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    //   Toast.makeText(requireContext(), "start ", Toast.LENGTH_SHORT).show()
+                    speechRecognizer.startListening(speechIntent)
+                    keep = ""
+                }
+                MotionEvent.ACTION_UP -> {
+                    //   Toast.makeText(requireContext(), "done ", Toast.LENGTH_SHORT).show()
+                    speechRecognizer.stopListening()
+                }
+            }
+            false
+        }*/
+
+
+        audioList = fetchSong()
+        // search()
+        // speech()
+        // time = thread()
+        // time.start()
     }
 
 
     override fun click() {
 
         play.setOnClickListener {
-            speechRecognizer.startListening(speechintent)
+            pause.visibility=View.VISIBLE
+            play.visibility=View.INVISIBLE
+          //  speechRecognizer.startListening(speechIntent)
             keep = ""
 
             if (musicService!!.mp == null) {
                 pos = 0
                 media()
             }
-            musicService!!.mp?.start()
+            musicService!!.mp?.play()
 
 
         }
         pause.setOnClickListener {
-            speechRecognizer.stopListening()
+         //   speechRecognizer.stopListening()
+            pause.visibility=View.VISIBLE
+            play.visibility=View.INVISIBLE
+
             musicService!!.mp?.pause()
-            //   activity?.stopService(Intent(requireContext(),MusicService::class.java))
+            activity?.stopService(Intent(requireContext(),MusicService::class.java))
         }
 
-        next.setOnLongClickListener(object : View.OnLongClickListener {
-            override fun onLongClick(p0: View?): Boolean {
-                if (musicService!!.mp != null) {
-                    musicService!!.mp!!.seekTo(musicService!!.mp!!.currentPosition + 10000)
-                }
-                return true
+        next.setOnLongClickListener {
+            if (musicService!!.mp != null) {
+                musicService!!.mp!!.seekTo(musicService!!.mp!!.currentPosition + 10000)
             }
-        })
+            true
+        }
 
-        preview.setOnLongClickListener(object : View.OnLongClickListener {
-            override fun onLongClick(p0: View?): Boolean {
-                if (musicService!!.mp != null) {
-                    musicService!!.mp!!.seekTo(musicService!!.mp!!.currentPosition - 10000)
-                }
-                return true
+        preview.setOnLongClickListener {
+            if (musicService!!.mp != null) {
+                musicService!!.mp!!.seekTo(musicService!!.mp!!.currentPosition - 10000)
             }
-        })
+            true
+        }
 
         next.setOnClickListener {
 
-            if (musicService!!.mp != null && audiolist.size - 1 > pos) ++pos
+            if (musicService!!.mp != null && audioList.size - 1 > pos) ++pos
             else pos = 0
 
             musicService!!.mp?.stop()
-            musicService!!.mp?.reset()
             media()
         }
 
         preview.setOnClickListener {
 
-            if (pos == 0) pos = audiolist.size - 1
+            if (pos == 0) pos = audioList.size - 1
             else --pos
 
             musicService!!.mp?.stop()
-            musicService!!.mp?.reset()
             media()
-            musicService!!.mp?.start()
         }
 
 
     }
 
-    fun timeduration(duration: Int): String {
+    fun timeDuration(duration: Int): String {
 
-        var min: Int = duration / 1000 / 60
-        var sec: Int = duration / 1000 % 60
+        val min: Int = duration / 1000 / 60
+        val sec: Int = duration / 1000 % 60
 
-        if (sec < 10)
-            return "" + min + ":0" + sec
+        return if (sec < 10)
+            "$min:0$sec"
         else
-            return "" + min + ":" + sec
+            "$min:$sec"
     }
 
-    fun speech() {
+    /*fun speech() {
 
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(requireContext())
-        speechintent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-        speechintent.putExtra(
+        speechIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        speechIntent.putExtra(
             RecognizerIntent.EXTRA_LANGUAGE_MODEL,
             RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
         )
-        speechintent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+        speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
 
         speechRecognizer.setRecognitionListener(object : RecognitionListener {
             override fun onReadyForSpeech(p0: Bundle?) {
@@ -251,8 +241,8 @@ import kotlin.collections.ArrayList
             }
 
             override fun onError(error: Int) {
-                var message = ""
-                message = when (error) {
+
+                val message = when (error) {
                     SpeechRecognizer.ERROR_AUDIO -> "Audio recording error"
                     SpeechRecognizer.ERROR_CLIENT -> "Client side error"
                     SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "Insufficient permissions"
@@ -268,7 +258,7 @@ import kotlin.collections.ArrayList
             }
 
             override fun onResults(p0: Bundle?) {
-                var match: ArrayList<String>? =
+                val match: ArrayList<String>? =
                     p0?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
 
                 if (match != null)
@@ -285,12 +275,12 @@ import kotlin.collections.ArrayList
             }
 
         })
-    }
+    }*/
 
-    fun fetch_song(): ArrayList<SongResponse> {
+    private fun fetchSong(): ArrayList<SongResponse> {
 
-        var temp=ArrayList<SongResponse>()
-        var suri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        val temp = ArrayList<SongResponse>()
+        val uri: Uri = Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(
             MediaStore.Audio.AudioColumns.DATA,
             MediaStore.Audio.AudioColumns.RELATIVE_PATH,
@@ -299,84 +289,84 @@ import kotlin.collections.ArrayList
             MediaStore.Audio.AudioColumns.ALBUM,
             MediaStore.Audio.ArtistColumns.ARTIST
         )
-        var cur: Cursor? = context?.contentResolver?.query(
-            suri,
+        val cur: Cursor? = context?.contentResolver?.query(
+            uri,
             projection,
             null,
             null,
-            MediaStore.Audio.Media.TITLE
+            Media.TITLE
         )
 
         if (cur != null && cur.moveToFirst()) {
             while (cur.moveToNext()) {
-                var songname = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.TITLE))
-                var ur = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DATA))
-                val falbum = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.ALBUM))
-                temp.add(SongResponse(songname, ur, falbum))
-
+                val songName = cur.getString(cur.getColumnIndex(Media.TITLE))
+                val url = cur.getString(cur.getColumnIndex(Media.DATA))
+                val album = cur.getString(cur.getColumnIndex(Media.ALBUM))
+                temp.add(SongResponse(songName, url, album))
             }
-            Log.d("@Data", audiolist.size.toString())
+            Log.d("@Data", audioList.size.toString())
         }
 
         cur?.close()
         song.layoutManager = LinearLayoutManager(requireContext())
-        songadapter = SonglistAdapter(temp, object : AdapterClickListerner {
+        songAdapter = SongListAdapter(temp,{
 
-            override fun onItemClick(view: View?, Pos: Int) {
+            if (it != pos) pos = it
 
-                if (Pos != pos) pos = Pos
+            musicService!!.mp?.stop()
+            media()
+            musicService!!.mp?.play()
+        },{
 
-                musicService!!.mp?.stop()
-                musicService!!.mp?.prepare()
-                media()
-                musicService!!.mp?.start()
-            }
+            currPlaySong.add(audioList[it])
+
         })
-        song.adapter = songadapter
 
+        song.adapter = songAdapter
         return temp
     }
 
     fun search() {
 
-        var temp: ArrayList<SongResponse> = ArrayList()
+        val temp: ArrayList<SongResponse> = ArrayList()
 
-        binding.toolbar.search.setOnQueryTextFocusChangeListener(object : SearchView.OnQueryTextListener,
+        binding.toolbar.search.setOnQueryTextFocusChangeListener(object :
+            SearchView.OnQueryTextListener,
             View.OnFocusChangeListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 Log.d("@Tag", query!!)
-                for (d in audiolist) {
-                    if (query.toString()?.contains(d.songname.toString()))
+                for (d in audioList) {
+                    if (query.toString().contains(d.songName.toString()))
                         temp.add(d)
                 }
-                if (query == "" || query!!.isEmpty())
-                    songadapter.searchlist(audiolist)
+                if (query == "" || query.isEmpty())
+                    songAdapter.searchList(audioList)
                 else
-                    songadapter.searchlist(temp)
+                    songAdapter.searchList(temp)
 
                 return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                Log.d("@Tagg", newText!!)
+                Log.d("@Tag", newText!!)
 
 
-                for (d in audiolist) {
-                    if (newText.toString()?.contains(d.songname.toString()))
+                for (d in audioList) {
+                    if (newText.toString().contains(d.songName.toString()))
                         temp.add(d)
                 }
-                if (newText == "" || newText!!.isEmpty())
-                    songadapter.searchlist(audiolist)
+                if (newText == "" || newText.isEmpty())
+                    songAdapter.searchList(audioList)
                 else
-                    songadapter.searchlist(temp)
+                    songAdapter.searchList(temp)
                 return false
             }
 
             override fun onFocusChange(p0: View?, p1: Boolean) {
                 if (p1)
-                   binding.toolbar.name.visibility = View.INVISIBLE
+                    binding.toolbar.name.visibility = View.INVISIBLE
                 else
-                   binding.toolbar.name.visibility = View.VISIBLE
+                    binding.toolbar.name.visibility = View.VISIBLE
             }
 
         })
@@ -386,21 +376,90 @@ import kotlin.collections.ArrayList
 
     fun media() {
 
-        var uri: Uri = Uri.parse(audiolist[pos].path)
-      //  var uri: Uri = Uri.parse("spotify:album:7wgrW5XyZdtk0K8PkW5A7h")
-       binding.playsheet.songname.text = audiolist[pos].songname//emp.songname
 
-        serviceintent.putExtra("Pos", pos)
-        musicService!!.mp = MediaPlayer.create(requireContext(), uri)
+        val uri: Uri = Uri.parse(audioList[pos].path)
+        //  var uri: Uri = Uri.parse("spotify:album:7wgrW5XyZdtk0K8PkW5A7h")
+        binding.playsheet.songname.text = audioList[pos].songName//emp.songName
+
+        serviceIntent.putExtra("Pos", pos)
+        musicService?.mp = context?.let {
+            ExoPlayer.Builder(it)
+                .build()
+                .also { exoPlayer ->
+                    val mediaItem = MediaItem.fromUri(uri)
+                 //   mediaItem.mediaMetadata(mediaItem)
+                    exoPlayer.setMediaItem(mediaItem)
+                    exoPlayer.repeatMode = Player.REPEAT_MODE_ALL
+                    exoPlayer.pauseAtEndOfMediaItems = false
+                    exoPlayer.playWhenReady = true
+                    exoPlayer.seekTo(0, 0)
+                    exoPlayer.prepare()
+                }
+        }
+
         musicService!!.Shownotification(pos)
 
-        seekBar.max = musicService?.mp!!.duration
-        musicService!!.Shownotification(pos)
-        start.text = timeduration(musicService!!.mp!!.currentPosition)
-        end.text = timeduration(musicService!!.mp!!.duration)
-        seekBar.progress = musicService!!.mp!!.currentPosition
-        musicService!!.mp!!.start()
+        musicService!!.mp?.play()
+
+
+        musicService?.mp?.addListener(
+            object : Player.Listener {
+                override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+                    super.onPlayerStateChanged(playWhenReady, playbackState)
+                    when (playbackState) {
+                        Player.STATE_READY -> {
+                            timer = object : CountDownTimerExt(musicService!!.mp!!.contentDuration, 1000) {
+                                override fun onTimerTick(millisUntilFinished: Long) {
+                                    if (musicService?.mp != null) {
+                                        if (musicService?.mp!!.isPlaying) {
+
+                                            play.visibility=View.INVISIBLE
+                                            pause.visibility=View.VISIBLE
+                                            start.text = timeDuration(musicService!!.mp!!.contentDuration.toInt())
+                                            end.text = timeDuration(musicService!!.mp!!.duration.toInt())
+                                            seekBar.progress = musicService!!.mp!!.contentPosition.toInt()
+                                            musicService!!.Shownotification(R.drawable.ic_pause_notification)
+                                            seekBar.max = musicService?.mp!!.contentDuration.toInt()
+                                        }
+                                        else{
+                                            play.visibility=View.VISIBLE
+                                            musicService!!.Shownotification(R.drawable.ic_play_notification)
+                                            pause.visibility=View.INVISIBLE
+                                        }
+                                    }
+                                }
+
+                                override fun onTimerFinish() {
+                                    play.visibility=View.VISIBLE
+                                    pause.visibility=View.INVISIBLE
+                                    musicService?.mp!!.stop()
+                                    musicService!!.Shownotification(R.drawable.ic_play_notification)
+                                    timer.restart()
+                                    if (audioList.size - 1 > pos) ++pos
+                                    else pos = 0
+                                    media()
+                                    seekBar.progress = 0
+                                }
+                            }
+                            timer.start()
+                        }
+                        Player.STATE_ENDED -> {
+                            play.visibility=View.VISIBLE
+                            pause.visibility=View.INVISIBLE
+                            musicService!!.Shownotification(R.drawable.ic_pause_notification)
+                            musicService?.mp!!.release()
+                            timer.restart()
+                            if (audioList.size - 1 > pos) ++pos
+                            else pos = 0
+                            media()
+                            seekBar.progress = 0
+                        }
+                    }
+                }
+            })
     }
+
+
 
     override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
         val binder = p1 as MusicService.MyBinder
@@ -411,50 +470,46 @@ import kotlin.collections.ArrayList
         musicService = null
     }
 
-    fun thread(): Thread {
+    /*fun thread(): Thread {
 
         return Thread(object : Runnable {
             override fun run() {
-                var han = Handler(Looper.getMainLooper())
+                val han = Handler(Looper.getMainLooper())
 
-                han.post(object : Runnable {
-                    override fun run() {
+                han.post {
+                    Timer().schedule(object : TimerTask() {
+                        override fun run() {
+                            try {
 
-                        Timer().schedule(object : TimerTask() {
-                            override fun run() {
-                                try {
-
-                                    if (musicService!!.mp!!.isPlaying) {
-                                        play.visibility = View.INVISIBLE
-                                        pause.visibility = View.VISIBLE
-                                        musicService!!.Shownotification(R.drawable.ic_pause_notification)
-                                    } else {
-                                        play.visibility = View.VISIBLE
-                                        pause.visibility = View.INVISIBLE
-                                        musicService!!.Shownotification(R.drawable.ic_play_notification)
-                                    }
-                                //    Log.d("@the", start.text.toString())
-                                    seekBar.progress = musicService!!.mp!!.currentPosition
-                                    if (start.text == end.text) {
-                                        musicService!!.mp?.stop()
-                                        musicService!!.mp?.prepare()
-                                        if (audiolist.size - 1 > pos) ++pos
-                                        else pos = 0
-
-                                        media()
-                                    }
-                                } catch (e: Exception) {
-                                    e.message
+                                if (musicService!!.mp!!.isPlaying) {
+                                    play.visibility = View.INVISIBLE
+                                    pause.visibility = View.VISIBLE
+                                    musicService!!.ShowNotification(R.drawable.ic_pause_notification)
+                                } else {
+                                    play.visibility = View.VISIBLE
+                                    pause.visibility = View.INVISIBLE
+                                    musicService!!.ShowNotification(R.drawable.ic_play_notification)
                                 }
-                            }
-                        }, 0, 1000)
-                    }
+                                //    Log.d("@the", start.text.toString())
+                                seekBar.progress = musicService!!.mp!!.currentPosition.toInt()
+                                if (start.text == end.text) {
+                                    musicService!!.mp?.stop()
+                                    musicService!!.mp?.prepare()
+                                    if (audioList.size - 1 > pos) ++pos
+                                    else pos = 0
 
-                })
+                                    media()
+                                }
+                            } catch (e: Exception) {
+                                e.message
+                            }
+                        }
+                    }, 0, 1000)
+                }
 
             }
         })
-    }
+    }*/
 
 
 }

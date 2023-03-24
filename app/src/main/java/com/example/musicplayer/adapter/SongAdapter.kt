@@ -20,7 +20,7 @@ class SongAdapter(var songlist: ArrayList<SongResponse>, var click: AdapterClick
     override fun onBindViewHolder(holder: SongAdapter.MyViewHolder, position: Int) {
         var item=songlist[position]
 
-        holder.binding.song.text=item.songname
+        holder.binding.song.text=item.songName
 
         holder.binding.song.setOnClickListener {
             click.onItemClick(it,position)

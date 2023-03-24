@@ -3,11 +3,10 @@ package com.example.musicplayer.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.musicplayer.common.AdapterClickListerner
 import com.example.musicplayer.databinding.LayoutSongBinding
 import com.example.musicplayer.model.SongResponse
 
-class SonglistAdapter(var songlist: ArrayList<SongResponse>, var itemclick:AdapterClickListerner): RecyclerView.Adapter<SonglistAdapter.MyViewHolder>(){
+class SongListAdapter(var songList: ArrayList<SongResponse>, var click:((pos:Int)->Unit), var longClick:((pos:Int)->Unit)): RecyclerView.Adapter<SongListAdapter.MyViewHolder>(){
 
     class MyViewHolder(var binding: LayoutSongBinding): RecyclerView.ViewHolder(binding.root)
 
@@ -16,23 +15,28 @@ class SonglistAdapter(var songlist: ArrayList<SongResponse>, var itemclick:Adapt
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        var item=songlist[position]
+        var item=songList[position]
 
         holder.binding.song.text=item.songName
 
         holder.binding.song.setOnClickListener {
-            itemclick.onItemClick(it,position)
+            click(position)
+        }
 
+        holder.binding.song.setOnLongClickListener {
+            longClick(position)
+             true
         }
     }
 
     override fun getItemCount(): Int {
-        return songlist.size
+        return songList.size
     }
 
-    fun searchlist(Songlist: ArrayList<SongResponse>)
+    fun searchList(SongList: ArrayList<SongResponse>)
     {
-        songlist=Songlist
+
+        songList=SongList
         notifyDataSetChanged()
     }
 

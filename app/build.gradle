@@ -40,6 +40,7 @@ android {
         jvmTarget = '1.8'
     }
 }
+def mediaVersion = "1.0.0-alpha03"
 
 dependencies {
 
@@ -113,4 +114,10 @@ dependencies {
     implementation "androidx.room:room-runtime:2.4.1"
     kapt "androidx.room:room-compiler:2.4.1"
     implementation "androidx.room:room-ktx:2.4.1"
+
+
+    //Exo player to manage
+    implementation "androidx.media3:media3-exoplayer:$mediaVersion"
+    implementation "androidx.media3:media3-ui:$mediaVersion"
+    implementation "androidx.media3:media3-exoplayer-dash:$mediaVersion"
 }

@@ -33,11 +33,11 @@ class NotificationReceive : BroadcastReceiver() {
             }
 
             Constant.NEXT -> {
-               /* DashboardFragment.musicService!!.pos += 1
+                DashboardFragment.musicService!!.pos += 1
                 DashboardFragment.musicService!!.mp!!.stop()
-                DashboardFragment.musicService!!.mp?.prepare()
+              //  DashboardFragment.musicService!!.mp?.prepare()
                 mp.media()
-                DashboardFragment.musicService!!.mp?.start()*/
+             //   DashboardFragment.musicService!!.mp?.start()
                 Toast.makeText(context, "Play", Toast.LENGTH_SHORT).show()
             }
             Constant.EXIT -> {
@@ -64,7 +64,7 @@ class NotificationReceive : BroadcastReceiver() {
         }*/
         //  else{
         DashboardFragment.musicService!!.Shownotification(R.drawable.ic_pause_notification)
-        DashboardFragment.musicService!!.mp!!.start()
+        DashboardFragment.musicService!!.mp!!.play()
         //  }
 
     }

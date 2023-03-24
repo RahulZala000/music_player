@@ -3,21 +3,25 @@ package com.example.musicplayer.ui
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.musicplayer.R
-import com.example.musicplayer.adapter.SongAdapter
 import com.example.musicplayer.databinding.ActivityMainBinding
 import com.example.musicplayer.ui.fragment.BaseActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.dashboard_toolbar.*
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
 
     lateinit var navHostFragment: NavHostFragment
     lateinit var navController: NavController
-    lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
+    lateinit var permission: ActivityResultLauncher<String>
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,8 +29,8 @@ class MainActivity : BaseActivity() {
         binding= ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
         supportActionBar?.hide()
+
         setupUi()
 
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
@@ -54,12 +58,4 @@ class MainActivity : BaseActivity() {
             navGraph.startDestination=R.id.spalshFragment
            navController.graph = navGraph
     }
-
-    override fun onResume() {
-        super.onResume()
-
-
-
-    }
-
 }

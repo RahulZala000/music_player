@@ -24,7 +24,7 @@ abstract class BaseFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupUI()
-
+        mContext=context
         click()
     }
 

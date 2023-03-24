@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.media.MediaPlayer
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
@@ -14,13 +13,10 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_MIN
-import androidx.core.content.PackageManagerCompat.LOG_TAG
+import androidx.media3.exoplayer.ExoPlayer
 import com.example.musicplayer.R
-import com.example.musicplayer.adapter.SonglistAdapter
-import com.example.musicplayer.common.AdapterClickListerner
+import com.example.musicplayer.adapter.SongListAdapter
 import com.example.musicplayer.common.Constant
-import com.example.musicplayer.common.Constant.MY_EMPTY_MEDIA_ROOT_ID
-import com.example.musicplayer.common.Constant.MY_MEDIA_ROOT_ID
 import com.example.musicplayer.model.SongResponse
 import com.example.musicplayer.ui.MainActivity
 import com.example.musicplayer.ui.fragment.DashboardFragment
@@ -32,7 +28,7 @@ import java.util.ArrayList
 class MusicService : Service() {
 
     var binder=MyBinder()
-    var mp: MediaPlayer? = null
+    var mp: ExoPlayer? = null
     var mediasession: MediaSessionCompat?=null
     var pos:Int=0
 //
@@ -44,7 +40,7 @@ class MusicService : Service() {
 
     var audiolist = ArrayList<SongResponse>()
     lateinit var tempsong: SongResponse
-    lateinit var songadapter: SonglistAdapter
+    lateinit var songadapter: SongListAdapter
 
     override fun onBind(p0: Intent?): IBinder? {
         return binder
@@ -100,24 +96,23 @@ class MusicService : Service() {
     fun Shownotification(play: Int) {
 
         var prevIntent=Intent(baseContext,NotificationReceive::class.java).setAction(Constant.PRE)
-        var prevpeding=PendingIntent.getBroadcast(baseContext,0,prevIntent,PendingIntent.FLAG_UPDATE_CURRENT)
+        var prevPending=PendingIntent.getBroadcast(baseContext,0,prevIntent,PendingIntent.FLAG_UPDATE_CURRENT)
 
         var nextIntent=Intent(baseContext,NotificationReceive::class.java).setAction(Constant.NEXT)
-        var nextpeding=PendingIntent.getBroadcast(baseContext,0,nextIntent,PendingIntent.FLAG_UPDATE_CURRENT)
+        var nextPending=PendingIntent.getBroadcast(baseContext,0,nextIntent,PendingIntent.FLAG_UPDATE_CURRENT)
 
         var playIntent=Intent(baseContext,NotificationReceive::class.java).setAction(Constant.PLAY)
-        var playpeding=PendingIntent.getBroadcast(baseContext,0,playIntent,PendingIntent.FLAG_UPDATE_CURRENT)
+        var playPending=PendingIntent.getBroadcast(baseContext,0,playIntent,PendingIntent.FLAG_UPDATE_CURRENT)
 
 
         var exitIntent=Intent(baseContext,NotificationReceive::class.java).setAction(Constant.EXIT)
-        var exitpeding=PendingIntent.getBroadcast(baseContext,0,exitIntent,PendingIntent.FLAG_UPDATE_CURRENT)
+        var exitPending=PendingIntent.getBroadcast(baseContext,0,exitIntent,PendingIntent.FLAG_UPDATE_CURRENT)
 
 
+        var notificationIntent = Intent(this, MainActivity::class.java)
+        notificationIntent.putExtra("Notify","Notify")
 
-        var notification_intent = Intent(this, MainActivity::class.java)
-        notification_intent.putExtra("Notify","Notify")
-
-        var pading_intent = PendingIntent.getActivity(this, 0, notification_intent, 0)
+        var pading_intent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
         var s= if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel("My_service", "My Background Service")
         }
@@ -129,13 +124,13 @@ class MusicService : Service() {
         val notification = notificationBuilder.setOngoing(true)
             .setContentInfo(Constant.NOTIFICATION)
             .setSmallIcon(R.drawable.ic_music)
-            .setContentTitle(DashboardFragment.audiolist[DashboardFragment.pos].songname)//
+            .setContentTitle(DashboardFragment.audioList[DashboardFragment.pos].songName)//
             .setLargeIcon(BitmapFactory.decodeResource(resources,R.drawable.music_notes))
             .setBadgeIconType(R.drawable.ic_music)
-            .addAction(R.drawable.ic_previou, "Pre", prevpeding)
-            .addAction(play, "Play", playpeding)
-            .addAction(R.drawable.ic_next, "Next", nextpeding)
-            .addAction(R.drawable.ic_exit,"Exit",exitpeding)
+            .addAction(R.drawable.ic_previou, "Pre", prevPending)
+            .addAction(play, "Play", playPending)
+            .addAction(R.drawable.ic_next, "Next", nextPending)
+            .addAction(R.drawable.ic_exit,"Exit",exitPending)
             .setContentIntent(pading_intent)
             .setStyle(
                 androidx.media.app.NotificationCompat.MediaStyle()
@@ -167,10 +162,9 @@ class MusicService : Service() {
     private fun initMusic() {
 
         if (mp != null) {
-          //  mp = DashboardFragment().mp!!
-            mp!!.isLooping = false
-
-            mp!!.setVolume(100f, 100f)
+            // mp = DashboardFragment().mp!!
+            // mp!!.isLooping = false
+            mp!!.volume = 100f
         }
     }
 
